@@ -25,7 +25,7 @@ services:
     depends_on:
       - mongodb
     volumes:
-      - ./api:/usr/src/app
+      - ./api/.env:/usr/src/app/.env
     networks:
       - sp
 
@@ -36,8 +36,6 @@ services:
         - 80:8080
     depends_on:
       - api
-    volumes:
-      - ./web:/usr/src/app
     networks:
       - sp
 
