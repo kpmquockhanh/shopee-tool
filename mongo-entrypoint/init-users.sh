@@ -11,11 +11,3 @@ fi
 echo ======================================================
 echo created $MONGO_INITDB_ROOT_USERNAME in database $MONGO_INITDB_DATABASE
 echo ======================================================
-
-
-
-db.createUser({
-     user: 'admin',
-     pwd: 'admin',
-     roles: [ "readWrite", "dbAdmin" ]
-     })

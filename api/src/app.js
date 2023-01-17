@@ -6,7 +6,8 @@ const app = express();
 
 loader(app);
 
-app.listen(port, err => {
+// eslint-disable-next-line consistent-return
+app.listen(port, (err) => {
   if (err) {
     console.log(err);
     return process.exit(1);
@@ -14,4 +15,4 @@ app.listen(port, err => {
   console.log(`Server is running on ${port}`);
 });
 
-export default app
+export default app;
