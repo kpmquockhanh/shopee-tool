@@ -1,24 +1,18 @@
 import { Router } from 'express';
-import { cartMiddleware, shopeeMiddleware } from '../middlewares/index.js';
 import {
-  addToCartByToken,
-  createNewCart,
-  getCart,
-  getCartByToken,
-  removeCart,
-  syncCart,
+  createNewCart, deleteCart,
+  getCartByToken, updateCartItems, deleteCartItems, syncCartItems,
 } from '../controllers/shopee/cartRoute.js';
+import { cartMiddleware } from '../middlewares/index.js';
 
 const router = Router();
 
-router.delete('/remove', ...[cartMiddleware], removeCart);
-router.get('/', ...[cartMiddleware], getCart);
+router.get('/:token', cartMiddleware, getCartByToken);
+router.delete('/:token', cartMiddleware, deleteCart);
+router.post('/:token/update', cartMiddleware, updateCartItems);
+router.delete('/:token/remove', cartMiddleware, deleteCartItems);
+router.post('/:token/sync', cartMiddleware, syncCartItems);
 
-router.get('/sync', ...[shopeeMiddleware, cartMiddleware], syncCart);
-
-router.get('/:token', ...[cartMiddleware], getCartByToken);
-router.post('/:token/add', ...[cartMiddleware], addToCartByToken);
-
-router.post('/init', ...[cartMiddleware], createNewCart);
+router.post('/', cartMiddleware, createNewCart);
 
 export default router;

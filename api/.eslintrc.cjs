@@ -17,6 +17,9 @@ module.exports = {
       {
         "js": true,
       }
-    ]
+    ],
+    "no-underscore-dangle": "off",
+    "no-param-reassign": "off",
+    "camelcase": "off",
   },
 };

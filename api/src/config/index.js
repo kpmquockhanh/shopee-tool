@@ -3,7 +3,6 @@ import { config } from 'dotenv';
 export { default as swaggerConfig } from './swagger.config.js';
 
 config();
-
 const {
   DB_URI,
   PORT,
@@ -14,6 +13,9 @@ const {
   AWS_REGION,
   BUCKET_NAME,
   SHOPEE_API,
+  DEBUG,
+  ENCRYPT_KEY,
+  IV,
 } = process.env;
 
 export const port = PORT || 3000;
@@ -27,3 +29,8 @@ export const bucketName = BUCKET_NAME;
 export const prefix = '/api';
 export const specs = '/docs';
 export const shopeeApi = SHOPEE_API;
+
+export const debug = DEBUG === 'true';
+
+export const encryptKey = ENCRYPT_KEY;
+export const iv = IV;

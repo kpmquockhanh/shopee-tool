@@ -1,6 +1,4 @@
-export default (code, data) => {
-    return {
-        code,
-        data
-    };
-};
+export default (code, data) => ({
+  code,
+  data,
+});

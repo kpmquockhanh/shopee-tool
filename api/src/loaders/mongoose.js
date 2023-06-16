@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
 
-import { dbUri } from '../config/index.js';
+import { dbUri, debug } from '../config/index.js';
 
 export default async () => {
-    console.log('Connecting to MongoDB...', dbUri);
+  console.log('Connecting to MongoDB...', dbUri);
+  if (debug) {
+    mongoose.set('debug', true);
+  }
   await mongoose.connect(
     dbUri,
     {

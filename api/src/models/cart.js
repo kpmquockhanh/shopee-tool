@@ -1,40 +1,40 @@
 import mongoose from 'mongoose';
+
 const { Schema, model } = mongoose;
 
 const cartSchema = Schema(
   {
-    dishes: {
-      type: [
-        {
-          dish_id: { type: Number, required: true },
-          quantity: { type: Number, required: true },
-          note: String,
-          options: [
-            {
-              id: Number,
-              option_items: [
-                {
-                  id: Number,
-                  quantity: Number,
-                },
-              ],
-            },
-          ],
-          user_id: { type: Number, required: true },
-          store_id: { type: Number, required: true },
-          img: String,
-          name: { type: String, required: true },
-          price: Number,
-        },
-      ],
+    createdBy: {
+      type: {
+        iv: { type: String, required: true },
+        content: { type: String, required: true },
+      },
       required: true,
     },
-    token: { type: String, required: true },
+    resId: {
+      type: Number,
+      required: true,
+    },
+    isSync: {
+      type: Boolean,
+    },
+    authKey: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
-  }
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
+
+cartSchema.virtual('cartItems', {
+  ref: 'CartItem',
+  localField: '_id',
+  foreignField: 'cart',
+});
 
 const Cart = model('Cart', cartSchema);
 
