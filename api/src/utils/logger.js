@@ -3,18 +3,18 @@ import ipHelper from './helpers/ip-helper.js';
 
 export default async (code, userId, errorMessage, level, req) => {
   let ip = 'no-ip';
-  if(req !== '') ip = ipHelper(req);
-  let log = new Log({
+  if (req !== '') ip = ipHelper(req);
+  const log = new Log({
     resultCode: code,
-    level: level,
-    errorMessage: errorMessage,
-    ip: ip
+    level,
+    errorMessage,
+    ip,
   });
 
   if (userId !== '' && userId) log.userId = userId;
 
   await log.save()
-    .catch(err => {
-      console.log('Logging is failed: ' + err);
+    .catch((err) => {
+      console.log(`Logging is failed: ${err}`);
     });
-}
+};

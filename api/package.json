@@ -4,6 +4,7 @@
   "description": "You can use this template when you're starting a new project. It contains general concepts, you can customize it according to your needs.",
   "main": "app.js",
   "dependencies": {
+    "@slack/webhook": "^6.1.0",
     "aws-sdk": "^2.855.0",
     "axios": "^1.2.1",
     "bcryptjs": "^2.4.3",

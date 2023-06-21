@@ -174,13 +174,18 @@ export async function deleteCartItems(req, res) {
     return res.status(400).json(errorHelper('00080', req, 'Invalid request'));
   }
 
-  const cartItem = await CartItem.findOneAndDelete({
-    _id: id,
-    authKey: req.authKey,
-  });
+  if (!req.isOwner) {
+    const cartItem = await CartItem.findOneAndDelete({
+      _id: id,
+      authKey: req.authKey,
+    });
+    if (!cartItem) {
+      return res.status(400).json(errorHelper('00080', req, 'Invalid request'));
+    }
+  }
 
   await Cart.findOneAndUpdate({
-    _id: cartItem.cart,
+    _id: id,
   }, {
     isSync: false,
   });
