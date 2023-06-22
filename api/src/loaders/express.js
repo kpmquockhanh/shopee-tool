@@ -4,6 +4,8 @@ import compression from 'compression';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import bodyParser from 'body-parser';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { prefix, jwtSecretKey } from '../config/index.js';
 import routes from '../routes/index.js';
 import { logger } from '../utils/index.js';
@@ -23,6 +25,9 @@ export default (app) => {
     process.exit(1);
   }
 
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+
   app.enable('trust proxy');
   app.use(cors());
   app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,7 +35,7 @@ export default (app) => {
   app.use(morgan('dev'));
   app.use(helmet());
   app.use(compression());
-  app.use(express.static('public'));
+  app.use(express.static(`${__dirname}/../public`));
   app.disable('x-powered-by');
   app.disable('etag');
 
