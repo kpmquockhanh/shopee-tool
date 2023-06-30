@@ -22,7 +22,6 @@ const responseFieldsCartItem = [
 ];
 
 export async function getCartByToken(req, res) {
-  console.log('hereeeee');
   let { token } = req.params;
   const { hash, resId } = req.query;
   if (!hash || !resId) {
@@ -33,7 +32,6 @@ export async function getCartByToken(req, res) {
     token = '';
   }
 
-  console.log('DEBUG token', token);
   let isNew = false;
   try {
     let cart;
@@ -180,6 +178,28 @@ export async function deleteCartItems(req, res) {
 
   await Cart.findOneAndUpdate({
     _id: id,
+  }, {
+    isSync: false,
+  });
+
+  return res.json(
+    responseHelper(
+      '00000',
+      {
+        status: true,
+      },
+    ),
+  );
+}
+export async function deleteAllCart(req, res) {
+  const { token } = req.params;
+
+  await CartItem.remove({
+    cart: token,
+  });
+
+  await Cart.findOneAndDelete({
+    _id: token,
   }, {
     isSync: false,
   });
