@@ -15,7 +15,7 @@ export default {
         email: 'bahricanyesil@gmail.com',
       },
     },
-    basePath: '/api',
+    basePath: '/src',
     servers: [
       {
         url: 'http://localhost:3000/api/',
@@ -31,8 +31,8 @@ export default {
   apis: [
     'src/models/*.js',
     'src/utils/helpers/*.js',
-    'src/api/controllers/user/*.js',
-    'src/api/controllers/user/edit/*.js',
-    'src/api/controllers/user/auth/*.js',
+    'src/src/controllers/user/*.js',
+    'src/src/controllers/user/edit/*.js',
+    'src/src/controllers/user/auth/*.js',
   ],
 };

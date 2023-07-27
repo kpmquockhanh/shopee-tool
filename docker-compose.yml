@@ -20,12 +20,12 @@ services:
       - sp
 
   api:
-    build: ./api
-    container_name: sp-api
+    build: src
+    container_name: sp-src
     depends_on:
       - mongodb
     volumes:
-      - ./api/.env:/usr/src/app/.env
+      - ./src/.env:/usr/src/app/.env
     networks:
       - sp
 
