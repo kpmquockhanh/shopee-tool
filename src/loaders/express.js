@@ -13,11 +13,11 @@ import { rateLimiter } from '../middlewares/index.js';
 
 export default (app) => {
   process.on('uncaughtException', async (error) => {
-    logger('00001', '', error.message, 'Uncaught Exception', '');
+    await logger('00001', '', error.message, 'Uncaught Exception', '');
   });
 
   process.on('unhandledRejection', async (ex) => {
-    logger('00002', '', ex.message, 'Unhandled Rejection', '');
+    await logger('00002', '', ex.message, 'Unhandled Rejection', '');
   });
 
   if (!jwtSecretKey) {
@@ -44,7 +44,7 @@ export default (app) => {
 
   app.get('/', (_req, res) => res.status(200).json({
     data: {
-      en: 'Project is successfully working...',
+      en: 'Shopee tool server is successfully working...',
     },
     code: '00004',
   }).end());
@@ -55,7 +55,7 @@ export default (app) => {
       'Access-Control-Allow-Headers',
       'Origin, X-Requested-With, Content-Type, Accept, Authorization',
     );
-    res.header('Content-Security-Policy-Report-Only', 'default-src: https:');
+    res.header('Content-Security-Policy-Report-Only', 'default-src-old: https:');
     if (req.method === 'OPTIONS') {
       res.header('Access-Control-Allow-Methods', 'PUT POST PATCH DELETE GET');
       return res.status(200).json({});
