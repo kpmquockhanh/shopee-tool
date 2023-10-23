@@ -155,6 +155,14 @@ export async function updateCartItems(req, res) {
       _id: token,
       resId,
     }).populate('cartItems', responseFieldsCartItem).exec();
+
+    if (req.io) {
+      req.io.to(token).emit('cart_updated', {
+        msg: `added ${product.name}`,
+        product,
+        addedBy,
+      });
+    }
     return res.json(
       responseHelper(
         '00000',
@@ -167,20 +175,34 @@ export async function updateCartItems(req, res) {
 }
 
 export async function deleteCartItems(req, res) {
-  const { id } = req.body;
+  const { token } = req.params;
+  const { id, addedBy } = req.body;
   if (!id) {
     return res.status(400).json(errorHelper('00080', req, 'Invalid request'));
   }
+
+  const cartItem = await CartItem.findOne({
+    _id: id,
+  });
 
   await CartItem.findOneAndDelete({
     _id: id,
   });
 
   await Cart.findOneAndUpdate({
-    _id: id,
+    _id: token,
   }, {
     isSync: false,
   });
+
+  if (req.io) {
+    req.io.to(token).emit('cart_updated', {
+      msg: `deleted ${cartItem.product.name}`,
+      product: cartItem.product,
+      addedBy,
+      isDelete: true,
+    });
+  }
 
   return res.json(
     responseHelper(
@@ -203,6 +225,13 @@ export async function deleteAllCart(req, res) {
   }, {
     isSync: false,
   });
+
+  if (req.io) {
+    req.io.to(token).emit('cart_updated', {
+      msg: 'Deleted all cart items',
+      product: null,
+    });
+  }
 
   return res.json(
     responseHelper(

@@ -7,6 +7,7 @@ export default async () => {
   if (debug) {
     mongoose.set('debug', true);
   }
+  mongoose.set('useFindAndModify', false);
   await mongoose.connect(
     dbUri,
     {

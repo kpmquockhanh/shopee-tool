@@ -39,16 +39,6 @@ export default (app) => {
   app.disable('x-powered-by');
   app.disable('etag');
 
-  app.use(rateLimiter);
-  app.use(prefix, routes);
-
-  app.get('/', (_req, res) => res.status(200).json({
-    data: {
-      en: 'Shopee tool server is successfully working...',
-    },
-    code: '00004',
-  }).end());
-
   app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header(
@@ -64,27 +54,35 @@ export default (app) => {
     return {};
   });
 
+  app.use(rateLimiter);
+  app.use(prefix, routes);
+
+  app.get('/', (_req, res) => res.status(200).json({
+    data: {
+      en: 'Shopee tool server is successfully working...',
+    },
+    code: '00004',
+  }).end());
+
   app.use((_req, _res, next) => {
     const error = new Error('Endpoint could not find!');
     error.status = 404;
     next(error);
   });
 
-  app.use((error, req, res) => {
-    res.status(error.status || 500);
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, req, res, next) => {
+    res.status(err.status || 500);
     let resultCode = '00015';
     let level = 'External Error';
-    if (error.status === 500) {
-      resultCode = '00013';
-      level = 'Server Error';
-    } else if (error.status === 404) {
+    if (err.status === 500) {
       resultCode = '00014';
       level = 'Client Error';
     }
-    logger(resultCode, req?.user?._id ?? '', error.message, level, req);
+    logger(resultCode, req?.user?._id ?? '', err.message, level, req);
     return res.json({
       data: {
-        en: error.message,
+        en: err.message,
       },
       code: resultCode,
     });

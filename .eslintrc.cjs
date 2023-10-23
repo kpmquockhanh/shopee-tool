@@ -21,5 +21,8 @@ module.exports = {
     "no-underscore-dangle": "off",
     "no-param-reassign": "off",
     "camelcase": "off",
+    "import/no-extraneous-dependencies": "off",
+    "no-console": "off",
+    // "consistent-return": "off",
   },
 };

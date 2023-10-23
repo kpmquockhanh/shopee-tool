@@ -14,11 +14,6 @@ export default async (req, res, next) => {
     _id: cartToken,
   });
 
-  if (cart && cart._id) {
-    req.isOwner = true;
-  } else {
-    req.isOwner = false;
-  }
-  console.log('DEBUG isOwner', req.isOwner);
+  req.isOwner = !!(cart && cart._id);
   next();
 };
