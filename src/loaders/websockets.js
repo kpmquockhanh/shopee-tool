@@ -65,6 +65,7 @@ export default async (expressServer, expressApp) => {
     if (room === id) {
       return;
     }
+    console.log('leave-room', room, id);
     const currentClient = io.sockets.sockets.get(id);
     io.to(room).emit('leave_room_user', {
       msg: `${currentClient.username} leave this group`,
