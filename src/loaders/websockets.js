@@ -28,10 +28,10 @@ export default async (expressServer, expressApp) => {
     // io.to(auth.cart).emit('welcome_msg', { msg: 'hello from emit room' });
     // socket.emit('my_message', 'welcome');
     // io.emit('hello', 'world');
-  });
 
-  io.on('disconnect', (socket) => {
-    console.log('a user disconnected', socket.id);
+    socket.on('disconnect', () => {
+      console.log('user disconnected');
+    });
   });
 
   const getAllClients = (room) => {
