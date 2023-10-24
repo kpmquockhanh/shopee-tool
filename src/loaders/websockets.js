@@ -76,15 +76,7 @@ export default async (expressServer, expressApp) => {
 
   io.use(async (socket, next) => {
     const { auth } = socket.handshake;
-    if (!auth || !auth.cart || !auth.key) {
-      return next(new Error('unauthorized'));
-    }
-    const cart = await Cart.findOne({
-      _id: auth.cart,
-      // authKey: auth.key,
-    }).exec();
-
-    if (!cart) {
+    if (!auth || !auth.key) {
       return next(new Error('unauthorized'));
     }
 

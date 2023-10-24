@@ -242,6 +242,7 @@ export async function deleteAllCart(req, res) {
     req.io.to(token).emit('cart_updated', {
       msg: 'Deleted all cart items',
       product: null,
+      isDeleteAll: true,
     });
   }
 
