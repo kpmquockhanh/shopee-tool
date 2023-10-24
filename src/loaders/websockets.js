@@ -22,11 +22,9 @@ export default async (expressServer, expressApp) => {
     const { auth } = socket.handshake;
     if (!auth?.cart) {
       socket.disconnect(true);
-      return;
     }
-    socket.username = auth.name;
 
-    socket.join(auth.cart);
+    // socket.join(auth.cart);
     // io.to(auth.cart).emit('welcome_msg', { msg: 'hello from emit room' });
     // socket.emit('my_message', 'welcome');
     // io.emit('hello', 'world');
@@ -93,6 +91,9 @@ export default async (expressServer, expressApp) => {
     if (!auth.name) {
       return next(new Error('invalid name'));
     }
+
+    socket.username = auth.name;
+    socket.res_id = auth.key;
 
     return next();
   });

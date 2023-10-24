@@ -57,6 +57,17 @@ export async function getCartByToken(req, res) {
       removable: item.authKey === req.authKey || req.isOwner,
     }));
 
+    if (req.io) {
+      const allSockets = req.io.sockets.sockets;
+      const socketsNotInRoom = Array.from(
+        allSockets.values(),
+      ).filter((socket) => socket.rooms.size === 1
+          && socket.rooms.has(socket.id)
+          && parseInt(socket.res_id, 10) === parseInt(resId, 10));
+      socketsNotInRoom.forEach((socket) => {
+        socket.join(token);
+      });
+    }
     return res.json(
       responseHelper(
         '00000',
@@ -213,6 +224,7 @@ export async function deleteCartItems(req, res) {
     ),
   );
 }
+
 export async function deleteAllCart(req, res) {
   const { token } = req.params;
 
