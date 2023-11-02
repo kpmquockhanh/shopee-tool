@@ -11,6 +11,7 @@ const cartItemSchema = Schema(
       price: { type: Number, required: true },
       image: { type: String, required: true },
       quantity: { type: Number, required: true },
+      options: { type: Array, required: false },
     },
     addedBy: { type: String, required: false },
     authKey: {

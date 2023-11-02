@@ -122,7 +122,9 @@ export async function deleteCart(req, res) {
 
 export async function updateCartItems(req, res) {
   const { token } = req.params;
-  const { product, addedBy, resId } = req.body;
+  const {
+    product, addedBy, resId,
+  } = req.body;
   if (!addedBy
     || !product
     || !product.id
@@ -148,6 +150,7 @@ export async function updateCartItems(req, res) {
     await CartItem.findOneAndUpdate({
       cart: cart._id,
       'product.id': product.id,
+      'product.options': product.options || {},
       addedBy,
       authKey: req.authKey,
     }, {
@@ -278,17 +281,25 @@ export async function syncCartItems(req, res) {
   if (respEmpty.code !== 0) {
     return res.status(400).json(errorHelper('00080', req, 'Cannot empty cart'));
   }
-  // eslint-disable-next-line no-restricted-syntax,no-unused-vars
+  // eslint-disable-next-line no-restricted-syntax
   for await (const cartItem of cart.cartItems) {
-    const resp = await shopee.addToCart({
+    const payload = {
       store_id: cart.resId,
       delivery_type: 1,
       shipping_type: 1,
       dishes: [{
         dish_id: parseInt(cartItem.product.id, 10),
         quantity: cartItem.product.quantity,
+        options: cartItem.product.options.map((option) => ({
+          id: parseInt(option.option_id, 10),
+          option_items: option.option_value_ids.map((optionValueId) => ({
+            id: optionValueId,
+            quantity: 1,
+          })),
+        })),
       }],
-    });
+    };
+    const resp = await shopee.addToCart(payload);
     if (resp.code !== 0) {
       isSuccess = false;
     }
@@ -303,7 +314,7 @@ export async function syncCartItems(req, res) {
 
   return res.json(
     responseHelper(
-      '00000',
+      isSuccess ? '00000' : '00080',
       {
         success: isSuccess,
       },
