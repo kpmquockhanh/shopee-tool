@@ -1,5 +1,4 @@
 import { Server } from 'socket.io';
-import { Cart } from '../models/index.js';
 
 export default async (expressServer, expressApp) => {
   const io = new Server(expressServer, {
@@ -20,7 +19,7 @@ export default async (expressServer, expressApp) => {
     console.log('a user connected', socket.id);
 
     const { auth } = socket.handshake;
-    if (!auth?.cart) {
+    if (!auth || !auth.cart) {
       socket.disconnect(true);
     }
 
