@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import bodyParser from 'body-parser';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import get from 'lodash/get.js';
 import { prefix, jwtSecretKey } from '../config/index.js';
 import routes from '../routes/index.js';
 import { logger } from '../utils/index.js';
@@ -79,7 +80,7 @@ export default (app) => {
       resultCode = '00014';
       level = 'Client Error';
     }
-    logger(resultCode, req?.user?._id ?? '', err.message, level, req);
+    logger(resultCode, get(req, 'user._id') ?? '', err.message, level, req);
     return res.json({
       data: {
         en: err.message,
