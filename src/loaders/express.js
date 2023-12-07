@@ -80,7 +80,7 @@ export default (app) => {
       resultCode = '00014';
       level = 'Client Error';
     }
-    logger(resultCode, get(req, 'user._id') ?? '', err.message, level, req);
+    logger(resultCode, get(req, 'user._id') || '', err.message, level, req);
     return res.json({
       data: {
         en: err.message,
