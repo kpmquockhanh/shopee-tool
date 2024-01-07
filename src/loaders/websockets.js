@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 
 export default async (expressServer, expressApp) => {
+  console.log('Start load ws');
   const io = new Server(expressServer, {
     cors: {
       origin: '*',
