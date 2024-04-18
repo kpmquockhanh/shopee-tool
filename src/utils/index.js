@@ -6,3 +6,4 @@ export { signAccessToken, signConfirmCodeToken, signRefreshToken } from './helpe
 export { default as ipHelper } from './helpers/ip-helper.js';
 export { default as errorHelper } from './helpers/error-helper.js';
 export { default as generateRandomCode } from './helpers/generate-random-code.js';
+export { genB2Link } from './helpers/fileHelper.js';

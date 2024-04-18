@@ -1,6 +1,18 @@
 import { Router } from 'express';
 import { auth, imageUpload } from '../middlewares/index.js';
-import { register, login, logout, verifyEmail, refreshToken, forgotPassword, sendVerificationCode, changePassword, editUser, getUser, deleteUser } from '../controllers/user/index.js';
+import {
+  changePassword,
+  deleteUser,
+  editUser,
+  forgotPassword,
+  getUser,
+  login,
+  logout,
+  refreshToken,
+  register,
+  sendVerificationCode,
+  verifyEmail,
+} from '../controllers/user/index.js';
 
 const router = Router();
 
@@ -15,9 +27,9 @@ router.post('/send-verification-code', sendVerificationCode);
 
 // EDIT
 router.post('/change-password', auth, changePassword);
-router.put('/', auth, imageUpload, editUser);
+router.put('/', auth, imageUpload(2000000), editUser);
 
 router.get('/', auth, getUser);
 router.delete('/', auth, deleteUser);
 
-export default router
+export default router;

@@ -107,3 +107,6 @@ dist
 package-lock.json
 
 .vscode/
+
+nginx/cert.pem
+nginx/key.pem

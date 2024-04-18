@@ -3,6 +3,8 @@ import responseHelper from '../utils/helpers/response-helper.js';
 import cartRoute from './cartRoute.js';
 import productRoute from './productRoute.js';
 import shopRoute from './shopRoute.js';
+import chatRoute from './chatRoute.js';
+import attachmentRoute from './attachmentRoute.js';
 
 const router = Router();
 
@@ -13,5 +15,9 @@ router.get('/', (req, res) => {
 router.use('/cart', cartRoute);
 router.use('/products', productRoute);
 router.use('/shops', shopRoute);
+
+router.use('/chat', chatRoute);
+
+router.use('/attachments', attachmentRoute);
 
 export default router;

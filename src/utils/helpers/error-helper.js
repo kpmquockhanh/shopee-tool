@@ -1,6 +1,5 @@
 import logger from '../logger.js';
 import en from '../lang/en.js';
-import responseHelper from './response-helper.js';
 
 export default (code, req, errorMessage) => {
   // NOTE: This control routes every server error to the same lang key.
@@ -18,7 +17,10 @@ export default (code, req, errorMessage) => {
     logger(code, userId, errorMessage ?? enMessage, 'Client Error', req);
   }
 
-  return responseHelper(code, errorMessage);
+  return {
+    code,
+    message: errorMessage,
+  };
 };
 
 /**

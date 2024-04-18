@@ -4,14 +4,16 @@
   "description": "You can use this template when you're starting a new project. It contains general concepts, you can customize it according to your needs.",
   "main": "app.js",
   "engines": {
-    "node": "16.x"
+    "node": "20.x"
   },
   "dependencies": {
     "@slack/webhook": "^6.1.0",
     "aws-sdk": "^2.855.0",
     "axios": "^1.2.1",
+    "backblaze-b2": "^1.7.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "buffer-image-size": "^0.6.4",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",

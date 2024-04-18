@@ -19,26 +19,6 @@ services:
     networks:
       - sp
 
-  api:
-    build: src-old
-    container_name: sp-src-old
-    depends_on:
-      - mongodb
-    volumes:
-      - ./src-old/.env:/usr/src-old/app/.env
-    networks:
-      - sp
-
-  web:
-    build: ./web
-    container_name: sp-web
-    ports:
-        - 80:8080
-    depends_on:
-      - api
-    networks:
-      - sp
-
 volumes:
   mongodb:
   mongoconfig:

@@ -3,9 +3,10 @@ import mongoose from 'mongoose';
 import { dbUri, debug } from '../config/index.js';
 
 export default async () => {
-  console.log('Connecting to MongoDB...', dbUri);
+  console.log('Connecting', debug);
   if (debug) {
     mongoose.set('debug', true);
+    console.log('Connecting to MongoDB...', dbUri);
   }
   mongoose.set('useFindAndModify', false);
   mongoose.set('useNewUrlParser', true);

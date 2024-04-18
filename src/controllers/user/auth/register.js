@@ -1,30 +1,35 @@
-import { User } from '../../../../models/index.js';
-import { validateRegister } from '../../../validators/user.validator.js';
-import { errorHelper, generateRandomCode, sendCodeToEmail, logger, getText, turkishToEnglish, signConfirmCodeToken } from '../../../../utils/index.js';
-import ipHelper from '../../../../utils/helpers/ip-helper.js';
 import bcrypt from 'bcryptjs';
-const { hash } = bcrypt;
 import geoip from 'geoip-lite';
+import { User } from '../../../models/index.js';
+import { validateRegister } from '../../../validators/user.validator.js';
+import {
+  errorHelper,
+  generateRandomCode,
+  sendCodeToEmail,
+  logger,
+  getText,
+  turkishToEnglish,
+  signAccessToken,
+} from '../../../utils/index.js';
+import ipHelper from '../../../utils/helpers/ip-helper.js';
+
+const { hash } = bcrypt;
+
 const { lookup } = geoip;
 
 export default async (req, res) => {
   const { error } = validateRegister(req.body);
   if (error) {
     let code = '00025';
-    if (error.details[0].message.includes('email'))
-      code = '00026';
-    else if (error.details[0].message.includes('password'))
-      code = '00027';
-    else if (error.details[0].message.includes('name'))
-      code = '00028';
+    if (error.details[0].message.includes('email')) code = '00026';
+    else if (error.details[0].message.includes('password')) code = '00027';
+    else if (error.details[0].message.includes('name')) code = '00028';
 
     return res.status(400).json(errorHelper(code, req, error.details[0].message));
   }
 
   const exists = await User.exists({ email: req.body.email })
-  .catch((err) => {
-    return res.status(500).json(errorHelper('00031', req, err.message));
-  });
+    .catch((err) => res.status(500).json(errorHelper('00031', req, err.message)));
 
   if (exists) return res.status(409).json(errorHelper('00032', req));
 
@@ -36,17 +41,17 @@ export default async (req, res) => {
   let username = '';
   let tempName = '';
   let existsUsername = true;
-  let name = turkishToEnglish(req.body.name);
+  const name = turkishToEnglish(req.body.name);
   if (name.includes(' ')) {
-    tempName = name.trim().split(' ').slice(0, 1).join('').toLowerCase();
+    tempName = name.trim().split(' ').slice(0, 1).join('')
+      .toLowerCase();
   } else {
     tempName = name.toLowerCase().trim();
   }
   do {
     username = tempName + generateRandomCode(4);
-    existsUsername = await User.exists({ username: username }).catch((err) => {
-      return res.status(500).json(errorHelper('00033', req, err.message));
-    });
+    // eslint-disable-next-line no-await-in-loop
+    existsUsername = await User.exists({ username }).catch((err) => res.status(500).json(errorHelper('00033', req, err.message)));
   } while (existsUsername);
 
   const geo = lookup(ipHelper(req));
@@ -54,28 +59,30 @@ export default async (req, res) => {
   let user = new User({
     email: req.body.email,
     password: hashed,
-    name: name,
-    username: username,
+    name,
+    username,
     language: req.body.language,
     platform: req.body.platform,
-    isVerified: false,
+    isVerified: true,
+    isActivated: true,
     countryCode: geo == null ? 'US' : geo.country,
     timezone: req.body.timezone,
-    lastLogin: Date.now()
+    lastLogin: Date.now(),
   });
 
-  user = await user.save().catch((err) => {
-    return res.status(500).json(errorHelper('00034', req, err.message));
-  });
+  user = await user.save().catch((err) => res.status(500).json(errorHelper('00034', req, err.message)));
 
   user.password = null;
-
-  const confirmCodeToken = signConfirmCodeToken(user._id, emailCode);
+  const accessToken = signAccessToken(user._id);
+  // const confirmCodeToken = signConfirmCodeToken(user._id, emailCode);
 
   logger('00035', user._id, getText('en', '00035'), 'Info', req);
   return res.status(200).json({
-    resultMessage: { en: getText('en', '00035'), tr: getText('tr', '00035') },
-    resultCode: '00035', user, confirmToken: confirmCodeToken
+    resultMessage: { en: getText('en', '00035') },
+    resultCode: '00035',
+    user,
+    accessToken,
+    // confirmToken: confirmCodeToken,
   });
 };
 

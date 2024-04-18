@@ -7,17 +7,20 @@ import bodyParser from 'body-parser';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import get from 'lodash/get.js';
-import { prefix, jwtSecretKey } from '../config/index.js';
+import { MulterError } from 'multer';
+import { prefix, jwtSecretKey, AppName } from '../config/index.js';
 import routes from '../routes/index.js';
 import { logger } from '../utils/index.js';
 import { rateLimiter } from '../middlewares/index.js';
 
 export default (app) => {
   process.on('uncaughtException', async (error) => {
+    console.log(error);
     await logger('00001', '', error.message, 'Uncaught Exception', '');
   });
 
   process.on('unhandledRejection', async (ex) => {
+    console.log(ex);
     await logger('00002', '', ex.message, 'Unhandled Rejection', '');
   });
 
@@ -60,9 +63,9 @@ export default (app) => {
 
   app.get('/', (_req, res) => res.status(200).json({
     data: {
-      en: 'Shopee tool server is successfully working...',
+      en: `${AppName} server is successfully working...`,
     },
-    code: '00004',
+    code: '00000',
   }).end());
 
   app.use((_req, _res, next) => {
@@ -73,7 +76,12 @@ export default (app) => {
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
-    res.status(err.status || 500);
+    console.log(err.name);
+    if (err.name === 'MulterError') {
+      res.status(400);
+    } else {
+      res.status(err.status || 500);
+    }
     let resultCode = '00015';
     let level = 'External Error';
     if (err.status === 500) {
