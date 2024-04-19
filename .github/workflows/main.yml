@@ -20,5 +20,6 @@ jobs:
             git checkout .
             git pull origin master
             node --version
+            yarn add sharp --ignore-engines
             yarn install
             sudo pm2 restart all
