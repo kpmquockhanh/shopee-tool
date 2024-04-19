@@ -22,7 +22,7 @@ const fileSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ['image', 'profile_image'],
+      enum: ['image', 'profile_image', 'preview'],
     },
     refId: {
       type: String,

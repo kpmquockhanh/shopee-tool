@@ -7,7 +7,6 @@ import bodyParser from 'body-parser';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import get from 'lodash/get.js';
-import { MulterError } from 'multer';
 import { prefix, jwtSecretKey, AppName } from '../config/index.js';
 import routes from '../routes/index.js';
 import { logger } from '../utils/index.js';

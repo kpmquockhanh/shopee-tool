@@ -1,4 +1,5 @@
 import sizeOf from 'buffer-image-size';
+import sharp from 'sharp';
 import { Attachment } from '../../models/index.js';
 import {
   validateCreateAttachment,
@@ -7,6 +8,51 @@ import {
 } from '../../validators/attachment.validator.js';
 import { blackblazeBucketId } from '../../config/index.js';
 import { genB2Link } from '../../utils/index.js';
+
+const uploadFile = async (
+  b2,
+  uploadUrl,
+  uploadAuthToken,
+  req,
+  body,
+  ts,
+  isPreview = false,
+) => {
+  let path = `${ts}_${req.file.originalname}`;
+  let type = 'image';
+  let data = req.file.buffer;
+  const contentLength = req.file.size;
+  if (isPreview) {
+    path = `preview/${path}`;
+    type = 'preview';
+
+    data = await sharp(req.file.buffer)
+      .jpeg({ quality: 60 })
+      .resize(300)
+      .toBuffer();
+  }
+
+  const resp = await b2.uploadFile({
+    uploadUrl,
+    uploadAuthToken,
+    fileName: path,
+    data,
+    contentLength,
+  });
+
+  const dimensions = sizeOf(data);
+  const attachment = new Attachment({
+    ...body,
+    src: resp.data.fileName,
+    createdBy: req.user._id,
+    refId: resp.data.fileId,
+    width: dimensions.width || 0,
+    height: dimensions.height || 0,
+    type,
+  });
+  await attachment.save();
+  return { ...(attachment.toJSON()), fullPath: genB2Link(attachment.src) };
+};
 
 export const getAttachments = async (req, res) => {
   const rs = validateGetAttachment(req.query);
@@ -18,7 +64,7 @@ export const getAttachments = async (req, res) => {
   const attachments = await Attachment
     .find({
       type: {
-        $ne: 'profile_image',
+        $in: ['preview'],
       },
     })
     .select({
@@ -52,34 +98,17 @@ export const createAttachment = async (req, res) => {
       message: 'File is required',
     });
   }
-
-  const dimensions = sizeOf(req.file.buffer);
   try {
     const b2 = req.app.get('b2');
     const { uploadUrl, authorizationToken: uploadAuthToken } = (await b2.getUploadUrl({
       bucketId: blackblazeBucketId,
     })).data;
 
-    const resp = await b2.uploadFile({
-      uploadUrl,
-      uploadAuthToken,
-      fileName: `${Date.now()}_${req.file.originalname}`,
-      data: req.file.buffer,
-      contentLength: req.file.size,
-    });
-
-    const attachment = new Attachment({
-      ...body,
-      src: resp.data.fileName,
-      type: resp.data.contentType.split('/')[0],
-      createdBy: req.user._id,
-      refId: resp.data.fileId,
-      width: dimensions.width || 0,
-      height: dimensions.height || 0,
-    });
-    await attachment.save();
-
-    attachment._doc.fullPath = genB2Link(attachment.src);
+    const ts = Date.now();
+    // Upload original file
+    await uploadFile(b2, uploadUrl, uploadAuthToken, req, body, ts);
+    // Update preview file
+    const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, req, body, ts, true);
 
     return res.status(201).json({
       attachment,
