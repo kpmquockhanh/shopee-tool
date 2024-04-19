@@ -16,15 +16,17 @@ const uploadFile = async (
   req,
   body,
   ts,
-  isPreview = false,
+  origin = null,
 ) => {
   let path = `${ts}_${req.file.originalname}`;
   let type = 'image';
   let data = req.file.buffer;
   const contentLength = req.file.size;
-  if (isPreview) {
+  let originId = null;
+  if (origin) {
     path = `preview/${path}`;
     type = 'preview';
+    originId = origin._id;
 
     data = await sharp(req.file.buffer)
       .jpeg({ quality: 60 })
@@ -49,6 +51,7 @@ const uploadFile = async (
     width: dimensions.width || 0,
     height: dimensions.height || 0,
     type,
+    origin: originId,
   });
   await attachment.save();
   return { ...(attachment.toJSON()), fullPath: genB2Link(attachment.src) };
@@ -106,9 +109,9 @@ export const createAttachment = async (req, res) => {
 
     const ts = Date.now();
     // Upload original file
-    await uploadFile(b2, uploadUrl, uploadAuthToken, req, body, ts);
+    const origin = await uploadFile(b2, uploadUrl, uploadAuthToken, req, body, ts);
     // Update preview file
-    const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, req, body, ts, true);
+    const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, req, body, ts, origin);
 
     return res.status(201).json({
       attachment,
@@ -138,10 +141,25 @@ export const deleteAttachment = async (req, res) => {
   }
 
   const b2 = req.app.get('b2');
+
   await b2.deleteFileVersion({
     fileId: attachment.refId,
     fileName: attachment.src,
   });
+
+  if (attachment.origin) {
+    const originAttachment = await Attachment.findOne({
+      _id: attachment.origin,
+    });
+
+    if (originAttachment) {
+      await b2.deleteFileVersion({
+        fileId: originAttachment.refId,
+        fileName: originAttachment.src,
+      });
+      await Attachment.findByIdAndDelete(attachment.origin);
+    }
+  }
 
   await Attachment.findByIdAndDelete(attachment_id);
   return res.status(204).json();

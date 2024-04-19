@@ -34,6 +34,10 @@ const fileSchema = new Schema(
     height: {
       type: Number,
     },
+    origin: {
+      type: Schema.Types.ObjectId,
+      ref: 'Attachment',
+    },
   },
   {
     timestamps: true,
