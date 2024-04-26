@@ -43,6 +43,8 @@ const uploadFile = async (
   });
 
   const dimensions = sizeOf(data);
+
+  console.log('KPM', 'description', body);
   const attachment = new Attachment({
     ...body,
     src: resp.data.fileName,
@@ -76,6 +78,7 @@ export const getAttachments = async (req, res) => {
       createdBy: 1,
       width: 1,
       height: 1,
+      description: 1,
     })
     .sort({ createdAt: -1 })
     .populate('createdBy', 'name')
