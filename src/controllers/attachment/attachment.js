@@ -1,5 +1,3 @@
-import sizeOf from 'buffer-image-size';
-import sharp from 'sharp';
 import { Attachment } from '../../models/index.js';
 import {
   validateCreateAttachment,
@@ -8,56 +6,7 @@ import {
 } from '../../validators/attachment.validator.js';
 import { blackblazeBucketId } from '../../config/index.js';
 import { genB2Link } from '../../utils/index.js';
-
-const uploadFile = async (
-  b2,
-  uploadUrl,
-  uploadAuthToken,
-  req,
-  body,
-  ts,
-  origin = null,
-) => {
-  let path = `${ts}_${req.file.originalname}`;
-  let type = 'image';
-  let data = req.file.buffer;
-  const contentLength = req.file.size;
-  let originId = null;
-  if (origin) {
-    path = `preview/${path}`;
-    type = 'preview';
-    originId = origin._id;
-
-    data = await sharp(req.file.buffer)
-      .jpeg({ quality: 60 })
-      .resize(300)
-      .toBuffer();
-  }
-
-  const resp = await b2.uploadFile({
-    uploadUrl,
-    uploadAuthToken,
-    fileName: path,
-    data,
-    contentLength,
-  });
-
-  const dimensions = sizeOf(data);
-
-  console.log('KPM', 'description', body);
-  const attachment = new Attachment({
-    ...body,
-    src: resp.data.fileName,
-    createdBy: req.user._id,
-    refId: resp.data.fileId,
-    width: dimensions.width || 0,
-    height: dimensions.height || 0,
-    type,
-    origin: originId,
-  });
-  await attachment.save();
-  return { ...(attachment.toJSON()), fullPath: genB2Link(attachment.src) };
-};
+import { uploadFile } from '../../utils/helpers/fileHelper.js';
 
 export const getAttachments = async (req, res) => {
   const rs = validateGetAttachment(req.query);
@@ -97,7 +46,6 @@ export const createAttachment = async (req, res) => {
   if (rs.error) {
     return res.status(400).json(rs.error);
   }
-  const { body } = req;
 
   if (!req.file) {
     return res.status(400).json({
@@ -112,9 +60,9 @@ export const createAttachment = async (req, res) => {
 
     const ts = Date.now();
     // Upload original file
-    const origin = await uploadFile(b2, uploadUrl, uploadAuthToken, req, body, ts);
+    const origin = await uploadFile(b2, uploadUrl, uploadAuthToken, 'image', req, ts);
     // Update preview file
-    const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, req, body, ts, origin);
+    const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, 'image', req, ts, origin);
 
     return res.status(201).json({
       attachment,

@@ -1,12 +1,12 @@
-import sizeOf from 'buffer-image-size';
 import { Attachment, User } from '../../../models/index.js';
 import { validateEditUser } from '../../../validators/user.validator.js';
 import {
-  errorHelper, logger, getText, genB2Link,
+  errorHelper, logger, getText,
 } from '../../../utils/index.js';
 import {
   blackblazeBucketId,
 } from '../../../config/index.js';
+import { uploadFile } from '../../../utils/helpers/fileHelper.js';
 
 export default async (req, res) => {
   const { error } = validateEditUser(req.body);
@@ -51,26 +51,9 @@ export default async (req, res) => {
         // Delete the old photo from the database
         await Attachment.deleteOne({ _id: oldPhoto._id });
       }
-      const dimensions = sizeOf(req.file.buffer);
 
-      const resp = await b2.uploadFile({
-        uploadUrl,
-        uploadAuthToken,
-        fileName: `${Date.now()}_${req.file.originalname}`,
-        data: req.file.buffer,
-        contentLength: req.file.size,
-      });
-
-      const attachment = new Attachment({
-        name: 'Profile Photo',
-        src: resp.data.fileName,
-        type: 'profile_image',
-        createdBy: req.user._id,
-        refId: resp.data.fileId,
-        width: dimensions.width || 0,
-        height: dimensions.height || 0,
-      });
-      await attachment.save();
+      const ts = Date.now();
+      const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, 'profile_image', req, ts);
 
       user.photo = attachment._id;
       await user.save();
@@ -78,7 +61,7 @@ export default async (req, res) => {
       return res.status(200).json({
         resultMessage: { en: getText('en', '00086'), tr: getText('tr', '00086') },
         resultCode: '00086',
-        photoUrl: genB2Link(resp.data.fileName),
+        photoUrl: attachment.fullPath,
       });
     } catch (err) {
       return res.status(500).json(errorHelper('00087', req, err.message)).end();

@@ -1,10 +1,10 @@
-import sizeOf from 'buffer-image-size';
 import { Attachment, Room } from '../../models/index.js';
 import { validateUpdateRoom } from '../../validators/chat.validator.js';
 import {
   errorHelper, genB2Link, getText, logger,
 } from '../../utils/index.js';
 import { blackblazeBucketId } from '../../config/index.js';
+import { uploadFile } from '../../utils/helpers/fileHelper.js';
 
 export default async (req, res) => {
   const { error } = validateUpdateRoom({ ...req.params, ...req.body });
@@ -38,26 +38,9 @@ export default async (req, res) => {
         // Delete the old photo from the database
         await Attachment.deleteOne({ _id: oldPhoto._id });
       }
-      const dimensions = sizeOf(req.file.buffer);
 
-      const resp = await b2.uploadFile({
-        uploadUrl,
-        uploadAuthToken,
-        fileName: `${Date.now()}_${req.file.originalname}`,
-        data: req.file.buffer,
-        contentLength: req.file.size,
-      });
-
-      const attachment = new Attachment({
-        name: 'Room photo',
-        src: resp.data.fileName,
-        type: 'room_thumbnail',
-        createdBy: req.user._id,
-        refId: resp.data.fileId,
-        width: dimensions.width || 0,
-        height: dimensions.height || 0,
-      });
-      await attachment.save();
+      const ts = Date.now();
+      const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, 'room_thumbnail', req, ts);
 
       await Room.updateOne({ _id: roomId }, {
         $set: {

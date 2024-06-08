@@ -21,6 +21,7 @@ const {
   BLACKBLAZE_APPLICATION_KEY,
   BLACKBLAZE_BUCKET_ID,
   BLACKBLAZE_BUCKET_URL,
+  SUB_FOLDER,
 } = process.env;
 
 export const AppName = APP_NAME;
@@ -42,3 +43,4 @@ export const blackblazeKeyId = BLACKBLAZE_KEY_ID;
 export const blackblazeApplicationKey = BLACKBLAZE_APPLICATION_KEY;
 export const blackblazeBucketId = BLACKBLAZE_BUCKET_ID;
 export const blackblazeBucketUrl = BLACKBLAZE_BUCKET_URL;
+export const subFolder = SUB_FOLDER;
