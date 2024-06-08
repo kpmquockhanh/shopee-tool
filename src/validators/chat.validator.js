@@ -29,3 +29,12 @@ export function validateDeleteRoom(body) {
   });
   return schema.validate(body);
 }
+
+export function validateUpdateRoom(body) {
+  const schema = Joi.object({
+    room_id: Joi.string().min(1).required(),
+    name: Joi.string().min(1).required(),
+    description: Joi.string().required(),
+  });
+  return schema.validate(body);
+}

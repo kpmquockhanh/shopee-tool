@@ -27,7 +27,7 @@ export default async (req, res) => {
   if (!user.isVerified) return res.status(400).json(errorHelper('00044', req));
 
   const match = await compare(req.body.password, user.password);
-  if (!match) return res.status(400).json(errorHelper('00045', req));
+  if (!match) return res.status(400).json(errorHelper('00045', req, 'Invalid email or password'));
 
   const accessToken = signAccessToken(user._id);
   const refreshToken = signRefreshToken(user._id);

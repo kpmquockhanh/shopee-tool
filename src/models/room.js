@@ -11,6 +11,10 @@ const roomSchema = new Schema(
     description: {
       type: String,
     },
+    thumbnail: {
+      type: Schema.Types.ObjectId,
+      ref: 'Attachment',
+    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',
