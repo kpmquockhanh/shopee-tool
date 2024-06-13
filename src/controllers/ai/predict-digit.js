@@ -56,7 +56,7 @@ export default async (req, res) => {
   console.log({
     x, y, x2, y2, width: x2 - x, height: y2 - y,
   });
-  fs.createWriteStream('grayscale_after_crop.png').write(grayImg.toBuffer());
+  // fs.createWriteStream('grayscale_after_crop.png').write(grayImg.toBuffer());
   grayImg = grayImg.crop({
     x,
     y,
@@ -67,8 +67,8 @@ export default async (req, res) => {
     color: 0,
   });
 
-  fs.createWriteStream('grayscale.png').write(grayImg.toBuffer());
-  fs.createWriteStream('original.png').write(img.toBuffer());
+  // fs.createWriteStream('grayscale.png').write(grayImg.toBuffer());
+  // fs.createWriteStream('original.png').write(img.toBuffer());
   // console.log('Prediction:', {
   //   grayImg: data.join(', '),
   // });
