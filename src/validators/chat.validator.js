@@ -38,3 +38,11 @@ export function validateUpdateRoom(body) {
   });
   return schema.validate(body);
 }
+
+export function validatePredict(body) {
+  const schema = Joi.object({
+    room_id: Joi.string().min(1).required(),
+    content: Joi.string().min(1).required(),
+  });
+  return schema.validate(body);
+}

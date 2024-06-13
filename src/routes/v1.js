@@ -5,6 +5,7 @@ import productRoute from './productRoute.js';
 import shopRoute from './shopRoute.js';
 import chatRoute from './chatRoute.js';
 import attachmentRoute from './attachmentRoute.js';
+import aiRoute from './aiRoute.js';
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.use('/shops', shopRoute);
 router.use('/chat', chatRoute);
 
 router.use('/attachments', attachmentRoute);
+router.use('/ai', aiRoute);
 
 export default router;
