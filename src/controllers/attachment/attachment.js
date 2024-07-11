@@ -15,12 +15,13 @@ export const getAttachments = async (req, res) => {
   }
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 10;
+  const cond = {
+    type: {
+      $in: ['preview'],
+    },
+  };
   const attachments = await Attachment
-    .find({
-      type: {
-        $in: ['preview'],
-      },
-    })
+    .find(cond)
     .select({
       name: 1,
       src: 1,
@@ -33,11 +34,14 @@ export const getAttachments = async (req, res) => {
     .populate('createdBy', 'name')
     .limit(limit)
     .skip((page - 1) * limit);
+  // Count total
+  const total = await Attachment.count(cond);
   return res.status(200).json({
     attachments: attachments.map((attachment) => {
       attachment._doc.fullPath = genB2Link(attachment.src);
       return attachment;
     }),
+    total,
   });
 };
 
