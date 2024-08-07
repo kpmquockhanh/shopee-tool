@@ -33,6 +33,7 @@ export const uploadFile = async (
 
     data = await sharp(req.file.buffer)
       .jpeg({ quality: 60 })
+      .rotate()
       .resize(300)
       .toBuffer();
   }
