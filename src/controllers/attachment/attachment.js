@@ -1,4 +1,4 @@
-import { Attachment } from '../../models/index.js';
+import { Attachment, Relationship } from '../../models/index.js';
 import {
   validateCreateAttachment,
   validateDeleteAttachment,
@@ -20,6 +20,27 @@ export const getAttachments = async (req, res) => {
       $in: ['preview'],
     },
   };
+
+  const { user } = req;
+  const listAvailableUserIds = [user._id];
+
+  const relationships = await Relationship.find({
+    $or: [{ origin: user._id }, { target: user._id }],
+    type: 'friend',
+    status: 'accepted',
+  });
+  relationships.forEach((r) => {
+    if (r.origin._id.toString() !== user._id.toString()) {
+      listAvailableUserIds.push(r.origin._id);
+    }
+    if (r.target._id.toString() !== user._id.toString()) {
+      listAvailableUserIds.push(r.target._id);
+    }
+  });
+  cond.createdBy = {
+    $in: listAvailableUserIds,
+  };
+
   const attachments = await Attachment
     .find(cond)
     .select({
@@ -31,16 +52,27 @@ export const getAttachments = async (req, res) => {
       description: 1,
     })
     .sort({ createdAt: -1 })
-    .populate('createdBy', 'name')
+    .populate({
+      path: 'createdBy',
+      select: 'name photo',
+      populate: {
+        path: 'photo',
+        select: 'src',
+      },
+    })
     .limit(limit)
     .skip((page - 1) * limit);
   // Count total
   const total = await Attachment.count(cond);
   return res.status(200).json({
-    attachments: attachments.map((attachment) => {
-      attachment._doc.fullPath = genB2Link(attachment.src);
-      return attachment;
-    }),
+    attachments: attachments.map((attachment) => ({
+      ...attachment.toJSON(),
+      createdBy: {
+        ...attachment.createdBy.toJSON(),
+        photoUrl: attachment.createdBy.toJSON().photo?.src ? genB2Link(attachment.createdBy.toJSON().photo.src) : '',
+      },
+      fullPath: genB2Link(attachment.src),
+    })),
     total,
   });
 };

@@ -4,8 +4,8 @@ import { createAttachment, deleteAttachment, getAttachments } from '../controlle
 
 const router = Router();
 
-router.get('/', getAttachments);
-router.post('/', auth, checkAdmin, imageUpload(10000000), createAttachment);
+router.get('/', auth, getAttachments);
+router.post('/', auth, imageUpload(10000000), createAttachment);
 router.delete('/:attachment_id', auth, checkAdmin, deleteAttachment);
 
 export default router;

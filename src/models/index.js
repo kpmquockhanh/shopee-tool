@@ -6,6 +6,7 @@ import cartItem from './cart_item.js';
 import roomModel from './room.js';
 import messageModel from './message.js';
 import AttachmentModel from './attachment.js';
+import RelationshipModel from './relationship.js';
 
 export const User = userModel;
 export const Token = tokenModel;
@@ -15,3 +16,4 @@ export const Cart = cartModel;
 export const Room = roomModel;
 export const Message = messageModel;
 export const Attachment = AttachmentModel;
+export const Relationship = RelationshipModel;

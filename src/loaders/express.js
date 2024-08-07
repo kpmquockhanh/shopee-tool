@@ -68,7 +68,7 @@ export default (app) => {
   }).end());
 
   app.use((_req, _res, next) => {
-    const error = new Error('Endpoint could not find!');
+    const error = new Error('not found');
     error.status = 404;
     next(error);
   });
