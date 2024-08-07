@@ -129,10 +129,14 @@ export const deleteAttachment = async (req, res) => {
 
   const b2 = req.app.get('b2');
 
-  await b2.deleteFileVersion({
-    fileId: attachment.refId,
-    fileName: attachment.src,
-  });
+  try {
+    await b2.deleteFileVersion({
+      fileId: attachment.refId,
+      fileName: attachment.src,
+    });
+  } finally {
+    await Attachment.findByIdAndDelete(attachment_id);
+  }
 
   if (attachment.origin) {
     const originAttachment = await Attachment.findOne({
@@ -140,14 +144,16 @@ export const deleteAttachment = async (req, res) => {
     });
 
     if (originAttachment) {
-      await b2.deleteFileVersion({
-        fileId: originAttachment.refId,
-        fileName: originAttachment.src,
-      });
-      await Attachment.findByIdAndDelete(attachment.origin);
+      try {
+        await b2.deleteFileVersion({
+          fileId: originAttachment.refId,
+          fileName: originAttachment.src,
+        });
+      } finally {
+        await Attachment.findByIdAndDelete(attachment.origin);
+      }
     }
   }
 
-  await Attachment.findByIdAndDelete(attachment_id);
   return res.status(204).json();
 };
