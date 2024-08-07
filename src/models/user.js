@@ -79,6 +79,9 @@ const userSchema = new Schema(
     deletedAt: {
       type: Date,
     },
+    memoryDate: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

@@ -35,6 +35,8 @@ export default async (req, res) => {
 
     user.username = req.body.username;
   }
+  console.log('KPM', req.body.date);
+  if (req.body.date) user.memoryDate = req.body.date;
   if (req.file) {
     try {
       const b2 = req.app.get('b2');
@@ -67,6 +69,7 @@ export default async (req, res) => {
       return res.status(500).json(errorHelper('00087', req, err.message)).end();
     }
   }
+  console.log('FINAL USER', user.toJSON());
   await user.save();
   logger('00086', req.user._id, getText('en', '00086'), 'Info', req);
   return res.status(200).json({

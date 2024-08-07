@@ -65,6 +65,7 @@ export function validateEditUser(body) {
     language: Joi.string().valid('tr', 'en'),
     gender: Joi.string().valid('male', 'female', 'other'),
     birthDate: Joi.date(),
+    date: Joi.date(),
   });
   return schema.validate(body);
 }
