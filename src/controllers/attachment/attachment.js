@@ -7,6 +7,7 @@ import {
 import { blackblazeBucketId } from '../../config/index.js';
 import { genB2Link } from '../../utils/index.js';
 import { uploadFile } from '../../utils/helpers/fileHelper.js';
+import { connection } from '../../loaders/rabitmq.js';
 
 export const getAttachments = async (req, res) => {
   const rs = validateGetAttachment(req.query);
@@ -100,6 +101,7 @@ export const createAttachment = async (req, res) => {
     // Update preview file
     const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, 'image', req, ts, origin);
 
+    connection.sendToQueue('new-image', { attachment_id: attachment._id }).then();
     return res.status(201).json({
       attachment,
     });

@@ -9,6 +9,7 @@
   "dependencies": {
     "@slack/webhook": "^6.1.0",
     "@tensorflow/tfjs-node": "^4.20.0",
+    "amqplib": "^0.10.4",
     "aws-sdk": "^2.855.0",
     "axios": "1.6.0",
     "backblaze-b2": "^1.7.0",

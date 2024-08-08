@@ -44,3 +44,6 @@ export const blackblazeApplicationKey = BLACKBLAZE_APPLICATION_KEY;
 export const blackblazeBucketId = BLACKBLAZE_BUCKET_ID;
 export const blackblazeBucketUrl = BLACKBLAZE_BUCKET_URL;
 export const subFolder = SUB_FOLDER;
+export const rabbitmqHost = process.env.RABBITMQ_HOST || '127.0.0.1';
+export const rabbitmqUser = process.env.RABBITMQ_USER || 'guest';
+export const rabbitmqPassword = process.env.RABBITMQ_PASSWORD || 'guest';
