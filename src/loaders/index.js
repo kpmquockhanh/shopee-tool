@@ -7,5 +7,4 @@ export default async (app) => {
   await mongooseLoader();
   expressLoader(app);
   backblaze(app);
-  initConnection();
 };
