@@ -31,10 +31,11 @@ export const uploadFile = async (
     type = 'preview';
     originId = origin._id;
 
-    data = await sharp(req.file.buffer)
+    data = await sharp(req.file.buffer, { pages: -1 })
       .jpeg({ quality: 60 })
       .rotate()
       .resize(300)
+      .gif()
       .toBuffer();
   }
 

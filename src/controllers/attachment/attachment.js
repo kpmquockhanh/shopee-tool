@@ -1,4 +1,4 @@
-import { Attachment, Relationship } from '../../models/index.js';
+import { Attachment, Relationship, User } from '../../models/index.js';
 import {
   validateCreateAttachment,
   validateDeleteAttachment,
@@ -121,11 +121,20 @@ export const deleteAttachment = async (req, res) => {
   const { attachment_id } = req.params;
   const attachment = await Attachment.findOne({
     _id: attachment_id,
-    createdBy: req.user._id,
+    // createdBy: req.user._id,
   });
   if (!attachment) {
     return res.status(404).json({
       message: 'Attachment not found',
+    });
+  }
+
+  const { user } = req;
+  const userDb = await User.findById(user._id);
+  console.log('userDb', userDb.toJSON(), attachment.createdBy);
+  if (userDb.type !== 'admin' && user._id.toString() !== attachment.createdBy.toString()) {
+    return res.status(403).json({
+      message: 'You are not authorized to delete this attachment',
     });
   }
 
