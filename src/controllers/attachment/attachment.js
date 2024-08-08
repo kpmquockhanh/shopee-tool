@@ -7,7 +7,7 @@ import {
 import { blackblazeBucketId } from '../../config/index.js';
 import { genB2Link } from '../../utils/index.js';
 import { uploadFile } from '../../utils/helpers/fileHelper.js';
-import { connection } from '../../loaders/rabitmq.js';
+import { connection } from '../../loaders/rabbitmq.js';
 
 export const getAttachments = async (req, res) => {
   const rs = validateGetAttachment(req.query);

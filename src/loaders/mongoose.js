@@ -16,7 +16,7 @@ export default async () => {
     dbUri,
   )
     .then(() => {
-      console.log('Mongodb Connect successfully!');
+      console.log('✅ Mongodb Connect successfully!');
     })
     .catch((err) => {
       console.log(err);

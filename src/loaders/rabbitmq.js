@@ -3,7 +3,7 @@ import client from 'amqplib';
 import {
   rabbitmqUser, rabbitmqPassword, rabbitmqHost,
 } from '../config/index.js';
-import { Attachment } from '../models/index.js';
+import handleNewImageUploaded from './rabbitmq-handlers/new-image-handler.js';
 
 class RabbitMQConnection {
   connection;
@@ -46,7 +46,7 @@ class RabbitMQConnection {
     }
   }
 
-  async consume(queue, handleIncomingNotification) {
+  async consume(queue, handler) {
     await this.channel.assertQueue(queue, {
       durable: true,
     });
@@ -57,8 +57,16 @@ class RabbitMQConnection {
         if (!msg) {
           return console.error('Invalid incoming message');
         }
-        handleIncomingNotification(msg?.content?.toString());
-        return this.channel.ack(msg);
+        try {
+          console.log('Message received', msg.content.toString());
+          const content = JSON.parse(msg.content.toString());
+          handler(content);
+          this.channel.ack(msg);
+          return null;
+        } catch (e) {
+          console.error(e);
+        }
+        return null;
       },
       {
         noAck: false,
@@ -67,20 +75,11 @@ class RabbitMQConnection {
   }
 }
 
-const handleNewImageUploaded = async (message) => {
-  console.log('Message received', message);
-  const msg = JSON.parse(message);
-  const attachment = await Attachment.findById(msg.attachment_id);
-  console.log(attachment);
-};
-
 const mqConnection = new RabbitMQConnection();
 
-const initConnection = () => {
+export default () => {
   mqConnection.connect().then(() => {
     mqConnection.consume('new-image', handleNewImageUploaded).then();
   });
 };
-
-export default initConnection;
 export const connection = mqConnection;

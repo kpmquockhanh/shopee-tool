@@ -16,7 +16,7 @@ export default async (app) => {
   try {
     const result = await b2.authorize({});
     if (result.status === 200) {
-      console.log('Connected to blacblaze success!');
+      console.log('✅ Connected to blacblaze success!');
       app.set('b2', b2);
     } else {
       console.log('Authorization failed:', result);
