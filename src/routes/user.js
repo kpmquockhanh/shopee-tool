@@ -12,6 +12,7 @@ import {
   register,
   sendVerificationCode,
   verifyEmail,
+  loginWithGoogle,
 } from '../controllers/user/index.js';
 
 const router = Router();
@@ -19,6 +20,7 @@ const router = Router();
 // AUTH
 router.post('/', register);
 router.post('/login', login);
+router.post('/oauthcallback', loginWithGoogle);
 router.post('/logout', auth, logout);
 router.post('/verify-email', verifyEmail);
 router.post('/refresh-token', refreshToken);

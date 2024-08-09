@@ -22,10 +22,6 @@ export default async (req, res) => {
 
   if (!user) return res.status(404).json(errorHelper('00042', req));
 
-  if (!user.isActivated) return res.status(400).json(errorHelper('00043', req));
-
-  if (!user.isVerified) return res.status(400).json(errorHelper('00044', req));
-
   const match = await compare(req.body.password, user.password);
   if (!match) return res.status(400).json(errorHelper('00045', req, 'Invalid email or password'));
 
