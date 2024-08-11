@@ -6,9 +6,10 @@ import {
   errorHelper, generateRandomCode, getText, logger, signAccessToken, signRefreshToken,
 } from '../../../utils/index.js';
 import ipHelper from '../../../utils/helpers/ip-helper.js';
+import { googleClientId } from '../../../config/index.js';
 
 export default async (req, res) => {
-  const client = new OAuth2Client('899795654886-n1vinnd46m7td8frm6h7m5mgvkbe6bu9.apps.googleusercontent.com');
+  const client = new OAuth2Client(googleClientId);
 
   // Call this function to validate the JWT credential sent from client-side
   async function verifyCredentials(credential) {

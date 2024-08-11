@@ -24,6 +24,7 @@ const {
   SUB_FOLDER,
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_CHAT_ID,
+  GOOGLE_CLIENT_ID,
 } = process.env;
 
 export const AppName = APP_NAME;
@@ -51,3 +52,4 @@ export const rabbitmqUser = process.env.RABBITMQ_USER || 'guest';
 export const rabbitmqPassword = process.env.RABBITMQ_PASSWORD || 'guest';
 export const telegramBotToken = TELEGRAM_BOT_TOKEN;
 export const telegramChatId = TELEGRAM_CHAT_ID;
+export const googleClientId = GOOGLE_CLIENT_ID;
