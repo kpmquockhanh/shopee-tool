@@ -2,7 +2,6 @@ import axios from 'axios';
 import { telegramBotToken } from '../../config/index.js';
 // eslint-disable-next-line import/prefer-default-export
 export const sendTelegramMessage = async (chatId, text) => {
-  text = text.replace(/([_*[\]()~`>#+=|{}.!-])/g, '\\$1');
   const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
   const payload = {
     chat_id: chatId,
@@ -18,3 +17,5 @@ export const sendTelegramMessage = async (chatId, text) => {
     throw error;
   }
 };
+
+export const replaceTelegramMarkdown = (text) => text.replace(/([_*[\]()~`>#+=|{}.!-])/g, '\\$1');

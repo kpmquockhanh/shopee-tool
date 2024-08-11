@@ -4,6 +4,7 @@ import {
   rabbitmqUser, rabbitmqPassword, rabbitmqHost,
 } from '../config/index.js';
 import handleNewImageUploaded from './rabbitmq-handlers/new-image-handler.js';
+import handleNewError from './rabbitmq-handlers/error-handler.js';
 
 class RabbitMQConnection {
   connection;
@@ -80,6 +81,7 @@ const mqConnection = new RabbitMQConnection();
 export default () => {
   mqConnection.connect().then(() => {
     mqConnection.consume('new-image', handleNewImageUploaded).then();
+    mqConnection.consume('new-error', handleNewError).then();
   });
 };
 export const connection = mqConnection;

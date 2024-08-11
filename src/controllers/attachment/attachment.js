@@ -14,6 +14,7 @@ export const getAttachments = async (req, res) => {
   if (rs.error) {
     return res.status(400).json(rs.error);
   }
+  console.log(rs.as.s);
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 10;
   const cond = {

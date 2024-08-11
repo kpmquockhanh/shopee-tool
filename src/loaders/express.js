@@ -11,15 +11,24 @@ import { prefix, jwtSecretKey, AppName } from '../config/index.js';
 import routes from '../routes/index.js';
 import { logger } from '../utils/index.js';
 import { rateLimiter } from '../middlewares/index.js';
+import { connection } from './rabbitmq.js';
 
 export default (app) => {
   process.on('uncaughtException', async (error) => {
     console.log(error);
+    connection.sendToQueue('new-error', {
+      level: 'Uncaught Exception',
+      stack: get(error, 'stack', ''),
+    }).then();
     await logger('00001', '', error.message, 'Uncaught Exception', '');
   });
 
   process.on('unhandledRejection', async (ex) => {
     console.log(ex);
+    connection.sendToQueue('new-error', {
+      level: 'Unhandled Rejection',
+      stack: get(ex, 'stack', ''),
+    }).then();
     await logger('00002', '', ex.message, 'Unhandled Rejection', '');
   });
 
@@ -75,7 +84,6 @@ export default (app) => {
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
-    console.log(err.name);
     if (err.name === 'MulterError') {
       res.status(400);
     } else {
