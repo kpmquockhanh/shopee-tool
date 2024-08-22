@@ -2,21 +2,23 @@
 export const initShopEvents = (io) => {
   io.on('connection', (socket) => {
     const { auth } = socket.handshake;
+    console.log('on connecccc', auth);
     if (!auth || !auth.cart) {
       socket.disconnect(true);
     }
 
+    socket.join(auth.cart);
     socket.on('disconnect', () => {
       //
     });
   });
 
   const getAllClients = (room) => {
-    const clients = io.sockets.adapter.rooms.get(room);
+    const clients = io.adapter.rooms.get(room);
     const clientData = [];
     clients.forEach((clientId) => {
       // this is the socket of each client in the room.
-      const clientSocket = io.sockets.sockets.get(clientId);
+      const clientSocket = io.sockets.get(clientId);
       clientData.push({
         id: clientSocket.id,
         name: clientSocket.username,
@@ -29,7 +31,8 @@ export const initShopEvents = (io) => {
     if (room === id) {
       return;
     }
-    const currentClient = io.sockets.sockets.get(id);
+
+    const currentClient = io.sockets.get(id);
     io.to(room).emit('new_room_user', {
       msg: `${currentClient.username} joined this group`,
       room,
@@ -42,7 +45,7 @@ export const initShopEvents = (io) => {
     if (room === id) {
       return;
     }
-    const currentClient = io.sockets.sockets.get(id);
+    const currentClient = io.sockets.get(id);
     io.to(room).emit('leave_room_user', {
       msg: `${currentClient.username} leave this group`,
       room,

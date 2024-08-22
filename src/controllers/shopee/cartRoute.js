@@ -171,7 +171,8 @@ export async function updateCartItems(req, res) {
     }).populate('cartItems', responseFieldsCartItem).exec();
 
     if (req.io) {
-      req.io.to(token).emit('cart_updated', {
+      console.log('kpm push cart', token);
+      req.io.of('/shopee').to(token).emit('cart_updated', {
         msg: `added ${product.name}`,
         product,
         addedBy,
@@ -210,7 +211,7 @@ export async function deleteCartItems(req, res) {
   });
 
   if (req.io) {
-    req.io.to(token).emit('cart_updated', {
+    req.io.of('/shopee').to(token).emit('cart_updated', {
       msg: `deleted ${cartItem.product.name}`,
       product: cartItem.product,
       addedBy,
@@ -242,7 +243,7 @@ export async function deleteAllCart(req, res) {
   });
 
   if (req.io) {
-    req.io.to(token).emit('cart_updated', {
+    req.io.of('/shopee').to(token).emit('cart_updated', {
       msg: 'Deleted all cart items',
       product: null,
       isDeleteAll: true,
