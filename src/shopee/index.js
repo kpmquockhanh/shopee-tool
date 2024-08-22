@@ -50,6 +50,7 @@ class Shopee {
       'x-foody-client-version': '3.0.0',
       origin: 'https://shopeefood.vn',
       referer: 'https://shopeefood.vn/',
+      'x-foody-access-token': this.token,
     } : this.getHeaders();
     let params = {};
     if (method === 'get') {
@@ -74,8 +75,7 @@ class Shopee {
     if (!shopId) {
       return [];
     }
-
-    return this.fetchApi('get', `/v5/buyer/store/dishes?restaurant_id=${shopId}`);
+    return this.fetchApi('get', `/dish/get_delivery_dishes?id_type=2&request_id=${shopId}`, {}, { isWeb: true });
   }
 
   async getShopeeInfo(url) {
@@ -89,13 +89,13 @@ class Shopee {
   }
 
   async addToCart(data) {
-    return this.fetchApi('POST', '/v5/cart/add_items', data);
+    return this.fetchApi('POST', '/v5/cart/add_items', data, { isWeb: true });
   }
 
   async emptyCart(resId) {
     return this.fetchApi('POST', '/v5/cart/empty_items', {
       store_id: resId,
-    });
+    }, { isWeb: true });
   }
 }
 

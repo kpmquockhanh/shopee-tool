@@ -7,14 +7,17 @@ export async function getDishes(req, res) {
   if (!req.params.shop_id) {
     return res.status(400).json(responseHelper(400, constants.invalidParams));
   }
-  const shopee = new Shopee(req.token);
-  const resp = await shopee.getShopeeProducts(req.params.shop_id);
+  const shopee = new Shopee(req.query.token.trim());
+  try {
+    const resp = await shopee.getShopeeProducts(req.params.shop_id);
+    if (resp.result !== 'success') {
+      return res.status(400).json(responseHelper(400, resp.msg));
+    }
 
-  if (resp.code !== 0) {
-    return res.status(400).json(responseHelper(400, resp.msg));
+    return res.json(responseHelper(200, get(resp, 'reply.menu_infos', [])));
+  } catch (err) {
+    return res.status(500).json(responseHelper(500, err.message));
   }
-
-  return res.json(responseHelper(200, get(resp, 'data.catalogs', [])));
 }
 
 export async function getShopInfo(req, res) {

@@ -62,8 +62,8 @@ export async function getCartByToken(req, res) {
       const socketsNotInRoom = Array.from(
         allSockets.values(),
       ).filter((socket) => socket.rooms.size === 1
-          && socket.rooms.has(socket.id)
-          && parseInt(socket.res_id, 10) === parseInt(resId, 10));
+        && socket.rooms.has(socket.id)
+        && parseInt(socket.res_id, 10) === parseInt(resId, 10));
       socketsNotInRoom.forEach((socket) => {
         socket.join(token);
       });
@@ -277,32 +277,39 @@ export async function syncCartItems(req, res) {
 
   const shopee = new Shopee(shopeeToken);
   let isSuccess = true;
-  const respEmpty = await shopee.emptyCart(cart.resId);
-  if (respEmpty.code !== 0) {
-    return res.status(400).json(errorHelper('00080', req, 'Cannot empty cart'));
-  }
-  // eslint-disable-next-line no-restricted-syntax
-  for await (const cartItem of cart.cartItems) {
-    const payload = {
-      store_id: cart.resId,
-      delivery_type: 1,
-      shipping_type: 1,
-      dishes: [{
-        dish_id: parseInt(cartItem.product.id, 10),
-        quantity: cartItem.product.quantity,
-        options: cartItem.product.options.map((option) => ({
-          id: parseInt(option.option_id, 10),
-          option_items: option.option_value_ids.map((optionValueId) => ({
-            id: optionValueId,
-            quantity: 1,
-          })),
-        })),
-      }],
-    };
-    const resp = await shopee.addToCart(payload);
-    if (resp.code !== 0) {
-      isSuccess = false;
+  try {
+    const respEmpty = await shopee.emptyCart(cart.resId);
+    if (respEmpty.code !== 0) {
+      return res.status(400).json(errorHelper('00080', req, 'Cannot empty cart'));
     }
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const cartItem of cart.cartItems) {
+      const payload = {
+        store_id: cart.resId,
+        delivery_type: 1,
+        shipping_type: 1,
+        dishes: [{
+          dish_id: parseInt(cartItem.product.id, 10),
+          quantity: cartItem.product.quantity,
+          options: cartItem.product.options.map((option) => ({
+            id: parseInt(option.option_id, 10),
+            option_items: option.option_value_ids
+              ? option.option_value_ids.map((optionValueId) => ({
+                id: optionValueId,
+                quantity: 1,
+              }))
+              : [],
+          })).filter((option) => option.option_items.length > 0),
+        }],
+      };
+      const resp = await shopee.addToCart(payload);
+      if (resp.code !== 0) {
+        isSuccess = false;
+      }
+    }
+  } catch (e) {
+    console.log(e);
+    isSuccess = false;
   }
   if (isSuccess) {
     await Cart.findOneAndUpdate({

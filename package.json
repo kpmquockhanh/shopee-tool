@@ -78,5 +78,6 @@
   "type": "module",
   "resolutions": {
     "nan": "2.18.0"
-  }
+  },
+  "packageManager": "yarn@4.4.0"
 }
