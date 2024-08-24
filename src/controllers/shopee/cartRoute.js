@@ -28,6 +28,11 @@ export async function getCartByToken(req, res) {
     return res.status(400).json(errorHelper('00080', req, 'Invalid request'));
   }
 
+  // validate hash as email by regex
+  if (!hash.match(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)) {
+    return res.status(400).json(errorHelper('00080', req, 'Invalid request'));
+  }
+
   if (token === 'new') {
     token = '';
   }
@@ -52,9 +57,10 @@ export async function getCartByToken(req, res) {
     }
 
     cart.cartItems = (cart.cartItems || []).map((item) => ({
-      ...item._doc,
+      ...item.toJSON(),
       authKey: '',
       removable: item.authKey === req.authKey || req.isOwner,
+      isYours: item.authKey === req.authKey,
     }));
 
     if (req.io) {
@@ -147,6 +153,8 @@ export async function updateCartItems(req, res) {
     if (!cart) {
       return res.status(404).json(errorHelper('00081', req, 'Cart not found'));
     }
+
+    console.log('KPM req.authKey', req.authKey);
     await CartItem.findOneAndUpdate({
       cart: cart._id,
       'product.id': product.id,
@@ -171,7 +179,6 @@ export async function updateCartItems(req, res) {
     }).populate('cartItems', responseFieldsCartItem).exec();
 
     if (req.io) {
-      console.log('kpm push cart', token);
       req.io.of('/shopee').to(token).emit('cart_updated', {
         msg: `added ${product.name}`,
         product,
