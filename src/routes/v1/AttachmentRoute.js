@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { auth, imageUpload } from '../middlewares/index.js';
-import { createAttachment, deleteAttachment, getAttachments } from '../controllers/attachment/attachment.js';
+import { auth, imageUpload } from '../../middlewares/index.js';
+import { createAttachment, deleteAttachment, getAttachments } from '../../controllers/attachment/AttachmentController.js';
 
 const router = Router();
 

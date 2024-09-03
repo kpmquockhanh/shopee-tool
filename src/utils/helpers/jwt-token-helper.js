@@ -3,18 +3,20 @@ import { jwtSecretKey, refreshTokenSecretKey } from '../../config/index.js';
 
 const { sign } = pkg;
 
-export function signAccessToken(userId) {
+const buildPayload = (user) => (user.toJSON());
+
+export function signAccessToken(user) {
   return sign(
-    { _id: userId },
+    buildPayload(user),
     jwtSecretKey,
     {
       expiresIn: '7d',
     },
   );
 }
-export function signRefreshToken(userId) {
+export function signRefreshToken(user) {
   return sign(
-    { _id: userId },
+    buildPayload(user),
     refreshTokenSecretKey,
     {
       expiresIn: '7d',

@@ -66,10 +66,6 @@
     "typescript": "^5.0.2",
     "xxxxx": "^1.0.3"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bahricanyesil/nodejs-starter-template.git"
-  },
   "keywords": [
     "node.js"
   ],

@@ -24,8 +24,8 @@ export default async (req, res) => {
 
   if (userToken.expiresIn <= Date.now() || !userToken.status) return res.status(400).json(errorHelper('00062', req));
 
-  const accessToken = signAccessToken(req.user._id);
-  const refreshToken = signRefreshToken(req.user._id);
+  const accessToken = signAccessToken(req.user);
+  const refreshToken = signRefreshToken(req.user);
 
   await Token.updateOne(
     { userId: req.user._id },

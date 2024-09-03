@@ -25,8 +25,8 @@ export default async (req, res) => {
   const match = await compare(req.body.password, user.password);
   if (!match) return res.status(400).json(errorHelper('00045', req, 'Invalid email or password'));
 
-  const accessToken = signAccessToken(user._id);
-  const refreshToken = signRefreshToken(user._id);
+  const accessToken = signAccessToken(user);
+  const refreshToken = signRefreshToken(user);
   // NOTE: 604800000 ms is equal to 7 days. So, the expiry date of the token is 7 days after.
   await Token.updateOne(
     { userId: user._id },

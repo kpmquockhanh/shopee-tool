@@ -4,7 +4,17 @@ import {
 } from '../../utils/index.js';
 
 export default async (req, res) => {
-  const user = await User.findById(req.user._id).populate('photo').catch((err) => res.status(500).json(errorHelper('00088', req, err.message)));
+  const user = await User
+    .findById(req.user._id)
+    .populate('photo')
+    .populate({
+      path: 'roles',
+      populate: {
+        path: 'permissions',
+      },
+    })
+    .populate('permissions')
+    .catch((err) => res.status(500).json(errorHelper('00088', req, err.message)));
 
   logger('00089', req.user._id, getText('en', '00089'), 'Info', req);
   return res.status(200).json({

@@ -82,6 +82,8 @@ const userSchema = new Schema(
     memoryDate: {
       type: Date,
     },
+    roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }],
+    permissions: [{ type: Schema.Types.ObjectId, ref: 'Permission' }],
   },
   {
     timestamps: true,

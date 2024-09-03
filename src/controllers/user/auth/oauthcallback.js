@@ -51,8 +51,8 @@ export default async (req, res) => {
     user = await newUser.save().catch((err) => res.status(500).json(errorHelper('00034', req, err.message)));
   }
 
-  const accessToken = signAccessToken(user._id);
-  const refreshToken = signRefreshToken(user._id);
+  const accessToken = signAccessToken(user);
+  const refreshToken = signRefreshToken(user);
   // NOTE: 604800000 ms is equal to 7 days. So, the expiry date of the token is 7 days after.
   await Token.updateOne(
     { userId: user._id },

@@ -1,8 +1,14 @@
 import { Router } from 'express';
-import { auth } from '../middlewares/index.js';
+import { auth } from '../../middlewares/index.js';
 import {
-  acceptInvitation, getFriends, inviteFriend, removeFriend, getInvitations, declineInvitation, searchFriends,
-} from '../controllers/friend/friend.js';
+  acceptInvitation,
+  declineInvitation,
+  getFriends,
+  getInvitations,
+  inviteFriend,
+  removeFriend,
+  searchFriends,
+} from '../../controllers/friend/FriendController.js';
 
 const router = Router();
 

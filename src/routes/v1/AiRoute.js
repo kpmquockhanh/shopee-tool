@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { imageUpload } from '../middlewares/index.js';
-import predict from '../controllers/ai/predict-digit.js';
+import predict from '../../controllers/ai/AiController.js';
+import { imageUpload } from '../../middlewares/index.js';
 
 const router = Router();
 

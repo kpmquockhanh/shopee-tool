@@ -10,7 +10,7 @@ const { verify } = jwt;
 
 export default async (req, res, next) => {
   let token = req.header('Authorization');
-  if (!token) return res.status(401).json(errorHelper('00006', req));
+  if (!token) return res.status(401).json(errorHelper('00006', req, 'invalid auth'));
 
   if (token.includes('Bearer')) token = req.header('Authorization').replace('Bearer ', '');
 

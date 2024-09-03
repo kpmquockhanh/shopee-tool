@@ -73,7 +73,7 @@ export default async (req, res) => {
   user = await user.save().catch((err) => res.status(500).json(errorHelper('00034', req, err.message)));
 
   user.password = null;
-  const accessToken = signAccessToken(user._id);
+  const accessToken = signAccessToken(user);
   // const confirmCodeToken = signConfirmCodeToken(user._id, emailCode);
 
   logger('00035', user._id, getText('en', '00035'), 'Info', req);

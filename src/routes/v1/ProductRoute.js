@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getDishes, getDishInfo } from '../controllers/shopee/productRoute.js';
+import { getDishes, getDishInfo } from '../../controllers/shopee/ProductController.js';
 
 const router = Router();
 

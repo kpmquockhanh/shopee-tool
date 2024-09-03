@@ -2,8 +2,8 @@ import { Router } from 'express';
 import {
   createNewCart, deleteCart,
   getCartByToken, updateCartItems, deleteCartItems, syncCartItems, deleteAllCart,
-} from '../controllers/shopee/cartRoute.js';
-import { cartMiddleware } from '../middlewares/index.js';
+} from '../../controllers/shopee/CartController.js';
+import { cartMiddleware } from '../../middlewares/index.js';
 
 const router = Router();
 

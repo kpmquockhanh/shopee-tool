@@ -29,8 +29,8 @@ export default async (req, res) => {
   await User.updateOne({ _id: req.user._id }, { $set: { isVerified: true } })
     .catch((err) => res.status(500).json(errorHelper('00056', req, err.message)));
 
-  const accessToken = signAccessToken(req.user._id);
-  const refreshToken = signRefreshToken(req.user._id);
+  const accessToken = signAccessToken(req.user);
+  const refreshToken = signRefreshToken(req.user);
   await Token.updateOne(
     { userId: req.user._id },
     {

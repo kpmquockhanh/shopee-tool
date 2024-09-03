@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getShopInfo } from '../controllers/shopee/productRoute.js';
+import { getShopInfo } from '../../controllers/shopee/ProductController.js';
 
 const router = Router();
 

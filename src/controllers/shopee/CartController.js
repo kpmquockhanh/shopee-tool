@@ -29,15 +29,16 @@ export async function getCartByToken(req, res) {
   }
 
   // validate hash as email by regex
-  if (!hash.match(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)) {
+  const regExpEmail = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+  if (!hash.match(regExpEmail)) {
     return res.status(400).json(errorHelper('00080', req, 'Invalid request'));
   }
 
+  let isNew = false;
   if (token === 'new') {
     token = '';
+    isNew = true;
   }
-
-  let isNew = false;
   try {
     let cart;
     if (token) {

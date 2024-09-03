@@ -7,6 +7,8 @@ import roomModel from './room.js';
 import messageModel from './message.js';
 import AttachmentModel from './attachment.js';
 import RelationshipModel from './relationship.js';
+import RoleModel from './role.js';
+import PermissionModel from './permission.js';
 
 export const User = userModel;
 export const Token = tokenModel;
@@ -17,3 +19,5 @@ export const Room = roomModel;
 export const Message = messageModel;
 export const Attachment = AttachmentModel;
 export const Relationship = RelationshipModel;
+export const Role = RoleModel;
+export const Permission = PermissionModel;
