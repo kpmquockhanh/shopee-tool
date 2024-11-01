@@ -1,7 +1,6 @@
 import client from 'amqplib';
-
 import {
-  rabbitmqUser, rabbitmqPassword, rabbitmqHost,
+  rabbitmqHost, rabbitmqPassword, rabbitmqUser, debug,
 } from '../config/index.js';
 import handleNewImageUploaded from './rabbitmq-handlers/new-image-handler.js';
 import handleNewError from './rabbitmq-handlers/error-handler.js';
@@ -18,19 +17,21 @@ class RabbitMQConnection {
     this.connected = true;
 
     try {
-      console.log('⌛️ Connecting to Rabbit-MQ Server');
+      const url = `amqp://${rabbitmqUser}:${rabbitmqPassword}@${rabbitmqHost}:5672`;
+      if (debug) {
+        console.log('⌛️ Connecting to Rabbit-MQ Server', url);
+      } else {
+        console.log('⌛️ Connecting to Rabbit-MQ Server');
+      }
       this.connection = await client.connect(
         `amqp://${rabbitmqUser}:${rabbitmqPassword}@${rabbitmqHost}:5672`,
       );
 
       console.log('✅ Rabbit MQ Connection is ready');
-
       this.channel = await this.connection.createChannel();
-
       console.log('🛸 Created RabbitMQ Channel successfully');
     } catch (error) {
-      console.error(error);
-      console.error('Not connected to MQ Server');
+      console.error('❌ Not connected to MQ Server', error.message);
     }
   }
 
@@ -40,6 +41,9 @@ class RabbitMQConnection {
         await this.connect();
       }
 
+      this.channel.assertQueue(queue, {
+        durable: true,
+      });
       this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
     } catch (error) {
       console.error(error);
@@ -76,12 +80,17 @@ class RabbitMQConnection {
   }
 }
 
-const mqConnection = new RabbitMQConnection();
-
 export default () => {
+  const mqConnection = new RabbitMQConnection();
   mqConnection.connect().then(() => {
     mqConnection.consume('new-image', handleNewImageUploaded).then();
     mqConnection.consume('new-error', handleNewError).then();
   });
 };
-export const connection = mqConnection;
+
+export const rabbitmqLoader = async (app) => {
+  const mqConnection = new RabbitMQConnection();
+  await mqConnection.connect();
+  app.set('mqConnection', mqConnection);
+  return mqConnection;
+};

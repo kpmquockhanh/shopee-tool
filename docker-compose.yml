@@ -24,8 +24,8 @@ services:
       # seeding scripts
       - ./mongo-entrypoint:/docker-entrypoint-initdb.d
       # named volumes
-      - mongodb:/data/db
-      - mongoconfig:/data/configdb
+      - ./db_data:/data/db
+      - ./db_config:/data/configdb
     networks:
       - sp
 
@@ -41,7 +41,6 @@ services:
       - sp
 
 volumes:
-  mongodb:
   mongoconfig:
   rabbitmq_data:
   rabbitmq_logs:

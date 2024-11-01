@@ -13,8 +13,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@slack/webhook": "^6.1.0",
-    "@tensorflow/tfjs-node": "^4.20.0",
     "amqplib": "^0.10.4",
     "aws-sdk": "^2.855.0",
     "axios": "1.6.0",
@@ -74,6 +72,5 @@
   "type": "module",
   "resolutions": {
     "nan": "2.18.0"
-  },
-  "packageManager": "yarn@4.4.0"
+  }
 }

@@ -26,4 +26,9 @@ export default (req, res, next) => {
       next();
     })
     .catch((err) => res.status(429).json(errorHelper('00024', req, err.message)));
+
+  // const rabbitmqConnection = req.app.get('mqConnection');
+  // rabbitmqConnection.sendToQueue('new-req', { ip: req.ip }).then(() => {
+  //
+  // });
 };

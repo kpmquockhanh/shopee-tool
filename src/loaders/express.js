@@ -11,12 +11,12 @@ import { prefix, jwtSecretKey, AppName } from '../config/index.js';
 import routes from '../routes/index.js';
 import { logger } from '../utils/index.js';
 import { rateLimiter } from '../middlewares/index.js';
-import { connection } from './rabbitmq.js';
 
 export default (app) => {
+  const rabbitmqConnection = app.get('mqConnection');
   process.on('uncaughtException', async (error) => {
     console.log(error);
-    connection.sendToQueue('new-error', {
+    rabbitmqConnection.sendToQueue('new-error', {
       level: 'Uncaught Exception',
       stack: get(error, 'stack', ''),
     }).then();
@@ -25,7 +25,7 @@ export default (app) => {
 
   process.on('unhandledRejection', async (ex) => {
     console.log(ex);
-    connection.sendToQueue('new-error', {
+    rabbitmqConnection.sendToQueue('new-error', {
       level: 'Unhandled Rejection',
       stack: get(ex, 'stack', ''),
     }).then();
