@@ -1,5 +1,5 @@
 import { Attachment } from '../../models/index.js';
-import { sendTelegramMessage } from '../../utils/helpers/telegram.js';
+import { replaceTelegramMarkdown, sendTelegramMessage } from '../../utils/helpers/telegram.js';
 import { telegramChatId } from '../../config/index.js';
 import { genB2Link } from '../../utils/index.js';
 
@@ -10,7 +10,7 @@ export default async (message) => {
     return;
   }
   sendTelegramMessage(telegramChatId, `
-  New image uploaded: ${genB2Link(attachment.src)}\n
-  Description: ${attachment.description}\n
-  By: ${attachment.createdBy.name}`).then();
+  New image uploaded: ${replaceTelegramMarkdown(genB2Link(attachment.src))}\n
+  Description: ${replaceTelegramMarkdown(attachment.description || 'no description')}\n
+  By: ${replaceTelegramMarkdown(attachment.createdBy.name)}`).then();
 };
