@@ -5,7 +5,7 @@ import { rabbitmqLoader } from './rabbitmq.js';
 
 export default async (app) => {
   await rabbitmqLoader(app);
-  await mongooseLoader();
+  await mongooseLoader(app);
   expressLoader(app);
   backblaze(app);
 };

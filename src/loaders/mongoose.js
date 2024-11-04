@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import { dbUri, debug } from '../config/index.js';
 
-export default async () => {
+export default async (app) => {
   if (debug) {
     mongoose.set('debug', true);
     console.log('⏳Connecting to MongoDB...', dbUri);
@@ -17,7 +17,8 @@ export default async () => {
   await mongoose.connect(
     dbUri,
   )
-    .then(() => {
+    .then((conn) => {
+      app.set('mongooseConnection', conn.connection);
       console.log('✅ Mongodb Connect successfully!');
     })
     .catch((err) => {
