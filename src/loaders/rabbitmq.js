@@ -4,6 +4,7 @@ import {
 } from '../config/index.js';
 import handleNewImageUploaded from './rabbitmq-handlers/new-image-handler.js';
 import handleNewError from './rabbitmq-handlers/error-handler.js';
+import handleHealthCheck from './rabbitmq-handlers/health-check-handler.js';
 
 class RabbitMQConnection {
   connection;
@@ -80,11 +81,18 @@ class RabbitMQConnection {
   }
 }
 
-export default () => {
+export default (conn) => {
   const mqConnection = new RabbitMQConnection();
   mqConnection.connect().then(() => {
-    mqConnection.consume('new-image', handleNewImageUploaded).then();
-    mqConnection.consume('new-error', handleNewError).then();
+    mqConnection.consume('new-image', handleNewImageUploaded).then(() => {
+      console.log('Awaiting new image upload...');
+    });
+    mqConnection.consume('new-error', handleNewError).then(() => {
+      console.log('Awaiting new error...');
+    });
+    mqConnection.consume('health-check', handleHealthCheck(conn)).then(() => {
+      console.log('Awaiting health check...');
+    });
   });
 };
 

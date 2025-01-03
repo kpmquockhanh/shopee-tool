@@ -14,14 +14,18 @@ export default async (app) => {
   mongoose.set('useCreateIndex', true);
   mongoose.set('useUnifiedTopology', true);
 
-  await mongoose.connect(
+  return mongoose.connect(
     dbUri,
   )
     .then((conn) => {
-      app.set('mongooseConnection', conn.connection);
+      if (app) {
+        app.set('mongooseConnection', conn.connection);
+      }
       console.log('✅ Mongodb Connect successfully!');
+      return conn.connection;
     })
     .catch((err) => {
       console.log(err);
+      return null;
     });
 };

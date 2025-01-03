@@ -42,6 +42,7 @@
     "multer": "^1.4.2",
     "nan": "2.18.0",
     "node-gyp": "10.0.1",
+    "node-schedule": "^2.1.1",
     "nodemailer": "^6.5.0",
     "nodemon": "^2.0.20",
     "npm": "^7.6.0",

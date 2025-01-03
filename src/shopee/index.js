@@ -75,7 +75,7 @@ class Shopee {
     if (!shopId) {
       return [];
     }
-    return this.fetchApi('get', `/dish/get_delivery_dishes?id_type=2&request_id=${shopId}`, {}, { isWeb: true });
+    return this.fetchApi('get', `/dish/get_delivery_dishes?id_type=2&request_id=${shopId}`, {}, { isWeb: false });
   }
 
   async getShopeeInfo(url) {
@@ -85,17 +85,17 @@ class Shopee {
 
     return this.fetchApi('get', '/delivery/get_from_url', {
       url,
-    }, { isWeb: true });
+    }, { isWeb: false });
   }
 
   async addToCart(data) {
-    return this.fetchApi('POST', '/v5/cart/add_items', data, { isWeb: true });
+    return this.fetchApi('POST', '/v5/cart/add_items', data, { isWeb: false });
   }
 
   async emptyCart(resId) {
     return this.fetchApi('POST', '/v5/cart/empty_items', {
       store_id: resId,
-    }, { isWeb: true });
+    }, { isWeb: false });
   }
 }
 

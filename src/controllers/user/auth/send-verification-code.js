@@ -1,7 +1,7 @@
 import { User } from '../../../models/index.js';
 import { validateSendVerificationCode } from '../../../validators/user.validator.js';
 import {
-  generateRandomCode, sendCodeToEmail, errorHelper, logger, getText, signConfirmCodeToken,
+  generateRandomCode, errorHelper, logger, getText, signConfirmCodeToken,
 } from '../../../utils/index.js';
 
 export default async (req, res) => {
@@ -14,7 +14,7 @@ export default async (req, res) => {
   if (!user) return res.status(404).json(errorHelper('00036', req));
 
   const emailCode = generateRandomCode(4);
-  await sendCodeToEmail(req.body.email, user.name, emailCode, user.language, 'newCode', req, res);
+  // await sendCodeToEmail(req.body.email, user.name, emailCode, user.language, 'newCode', req, res);
 
   user.isVerified = false;
 

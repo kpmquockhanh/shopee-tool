@@ -7,7 +7,7 @@ export async function getDishes(req, res) {
   if (!req.params.shop_id) {
     return res.status(400).json(responseHelper(400, constants.invalidParams));
   }
-  const shopee = new Shopee(req.query.token.trim());
+  const shopee = new Shopee(req.token);
   try {
     const resp = await shopee.getShopeeProducts(req.params.shop_id);
     if (resp.result !== 'success') {

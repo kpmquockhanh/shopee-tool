@@ -5,7 +5,7 @@ import { validateRegister } from '../../../validators/user.validator.js';
 import {
   errorHelper,
   generateRandomCode,
-  sendCodeToEmail,
+  // sendCodeToEmail,
   logger,
   getText,
   turkishToEnglish,
@@ -36,7 +36,7 @@ export default async (req, res) => {
   const hashed = await hash(req.body.password, 10);
 
   const emailCode = generateRandomCode(4);
-  await sendCodeToEmail(req.body.email, req.body.name, emailCode, req.body.language, 'register', req, res);
+  // await sendCodeToEmail(req.body.email, req.body.name, emailCode, req.body.language, 'register', req, res);
 
   let username = '';
   let tempName = '';
