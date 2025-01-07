@@ -25,3 +25,18 @@ export function validateDeleteAttachment(params) {
   });
   return schema.validate(params);
 }
+
+export const validateGetUnusedAttachments = (params) => {
+  const schema = Joi.object({
+    page: Joi.number(),
+    limit: Joi.number(),
+  });
+  return schema.validate(params);
+};
+
+export const validateDeleteUnusedAttachments = (params) => {
+  const schema = Joi.object({
+    ref_id: Joi.string().required(),
+  });
+  return schema.validate(params);
+};

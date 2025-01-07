@@ -1,11 +1,13 @@
 import { Attachment, Relationship, User } from '../../models/index.js';
 import {
   validateCreateAttachment,
-  validateDeleteAttachment,
-  validateGetAttachment,
+  validateDeleteAttachment, validateDeleteUnusedAttachments,
+  validateGetAttachment, validateGetUnusedAttachments,
 } from '../../validators/attachment.validator.js';
 import { blackblazeBucketId } from '../../config/index.js';
-import { genB2Link } from '../../utils/index.js';
+import {
+  errorHelper, genB2Link,
+} from '../../utils/index.js';
 import { uploadFile } from '../../utils/helpers/fileHelper.js';
 
 export const getAttachments = async (req, res) => {
@@ -131,7 +133,6 @@ export const deleteAttachment = async (req, res) => {
 
   const { user } = req;
   const userDb = await User.findById(user._id);
-  console.log('userDb', userDb.toJSON(), attachment.createdBy);
   if (userDb.type !== 'admin' && user._id.toString() !== attachment.createdBy.toString()) {
     return res.status(403).json({
       message: 'You are not authorized to delete this attachment',
@@ -166,5 +167,132 @@ export const deleteAttachment = async (req, res) => {
     }
   }
 
+  return res.status(204).json();
+};
+
+export const getUnusedAttachments = async (req, res) => {
+  const rs = validateGetUnusedAttachments(req.query);
+  if (rs.error) {
+    return res.status(400).json(rs.error);
+  }
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const cond = {
+    // refId: null,
+  };
+
+  const attachments = await Attachment
+    .find(cond)
+    .select({
+      src: 1,
+      refId: 1,
+      type: 1,
+    })
+    .sort({ createdAt: -1 })
+    .limit(limit || 10)
+    .skip((page - 1) * limit);
+
+  const availAttachments = {};
+  const filteredAttachmentIds = [];
+  const deletedAttachmentIds = [];
+  // const endOfSrcToRefId = {};
+  const refIdTofileName = {};
+
+  attachments.forEach((attachment) => {
+    const endOfSrc = attachment.src.split('/').pop();
+    // endOfSrcToRefId[endOfSrc] = attachment.refId;
+    refIdTofileName[attachment.refId] = attachment.src;
+    if (availAttachments[endOfSrc] === undefined) {
+      availAttachments[endOfSrc] = {
+        preview: '',
+        image: '',
+        profile_image: '',
+      };
+    }
+
+    if (attachment.type === 'preview') {
+      availAttachments[endOfSrc].preview = attachment.refId;
+    } else if (attachment.type === 'image') {
+      availAttachments[endOfSrc].image = attachment.refId;
+    } else if (attachment.type === 'profile_image') {
+      availAttachments[endOfSrc].profile_image = attachment.refId;
+    }
+  });
+
+  Object.keys(availAttachments).forEach((fileName) => {
+    if (availAttachments[fileName].profile_image) {
+      return;
+    }
+    if (!availAttachments[fileName].preview || !availAttachments[fileName].image) {
+      const refId = availAttachments[fileName].image || availAttachments[fileName].preview;
+      filteredAttachmentIds.push({
+        fileName: refIdTofileName[refId],
+        id: refId,
+        fullPath: genB2Link(refIdTofileName[refId]),
+      });
+    }
+  });
+  const b2 = req.app.get('b2');
+  const filenames = await b2.listFileNames({
+    bucketId: blackblazeBucketId,
+    // maxFileCount: 100,
+  });
+
+  filenames.data.files.forEach((filename) => {
+    const endOfSrc = filename.fileName.split('/').pop();
+    if (availAttachments[endOfSrc]) {
+      return;
+    }
+    deletedAttachmentIds.push({
+      fileName: filename.fileName,
+      id: filename.fileId,
+      fullPath: genB2Link(filename.fileName),
+    });
+  });
+
+  return res.status(200).json({
+    attachments: [...deletedAttachmentIds, ...filteredAttachmentIds],
+  });
+};
+
+export const deleteUnusedAttachments = async (req, res) => {
+  const rs = validateDeleteUnusedAttachments(req.body);
+  if (rs.error) {
+    return res.status(400).json(rs.error);
+  }
+  const { ref_id } = req.body;
+  const cond = {
+    refId: ref_id,
+  };
+
+  const attachment = await Attachment
+    .findOne(cond)
+    .select({
+      src: 1,
+      refId: 1,
+      type: 1,
+    });
+
+  if (attachment) {
+    await Attachment.deleteOne({
+      refId: ref_id,
+    });
+  }
+
+  try {
+    const b2 = req.app.get('b2');
+    const fileInfo = await b2.getFileInfo({
+      fileId: ref_id,
+    }); // returns promise
+    await b2.deleteFileVersion({
+      fileId: fileInfo.data.fileId,
+      fileName: fileInfo.data.fileName,
+    });
+  } catch (e) {
+    if (e.response.data.status === 400) {
+      return res.status(400).json(errorHelper('00090', req, e.response.data.message));
+    }
+    return res.status(500).json(errorHelper('00090', req, e.message));
+  }
   return res.status(204).json();
 };
