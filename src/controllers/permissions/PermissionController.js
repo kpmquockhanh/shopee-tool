@@ -6,12 +6,15 @@ import {
   validateAssignRole,
   validateCreatePermission,
   validateCreateRole,
+  validateGetListUsers,
 } from '../../validators/role_permission.validator.js';
 
 const getPermissionsByUser = (user) => merge(user.permissions, user.roles.permissions)
   .map((permission) => ({
     name: permission.name,
   }));
+
+
 export const getAllPermissions = async (req, res) => {
   const user = await User.findById(req.user._id).populate(['roles.permissions', 'permissions']);
   if (!user) return errorHelper('00001', req, 'User not found');
@@ -129,7 +132,7 @@ export const updateRole = async (req, res) => {
   const permissionsExist = await Permission.find({ _id: { $in: payload.permissions } });
   role.permissions = permissionsExist.map((permission) => permission._id);
   await role.save();
-  return res.json({ });
+  return res.json({});
 };
 
 export const assignRole = async (req, res) => {
@@ -167,3 +170,14 @@ export const assignRole = async (req, res) => {
   }
   return res.json({});
 };
+
+
+export const getAllUsers = (req, res) => {
+  const { error } = validateGetListUsers(req.query);
+  if (error) return res.status(400).json(errorHelper('00066', req, error.details[0].message));
+
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+
+  return res.json({ page, limit })
+}

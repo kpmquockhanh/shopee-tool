@@ -155,7 +155,6 @@ export async function updateCartItems(req, res) {
       return res.status(404).json(errorHelper('00081', req, 'Cart not found'));
     }
 
-    console.log('KPM req.authKey', req.authKey);
     await CartItem.findOneAndUpdate({
       cart: cart._id,
       'product.id': product.id,

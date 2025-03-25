@@ -38,6 +38,14 @@ const fileSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Attachment',
     },
+    public: {
+      type: Boolean,
+      default: false,
+    },
+    featured: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

@@ -35,7 +35,6 @@ export default async (req, res) => {
 
     user.username = req.body.username;
   }
-  console.log('KPM', req.body.date);
   if (req.body.date) user.memoryDate = req.body.date;
   if (req.file) {
     try {

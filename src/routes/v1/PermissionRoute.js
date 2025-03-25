@@ -8,6 +8,7 @@ import {
   getOwnedPermissions,
   updatePermissions,
   updateRole,
+  getAllUsers,
 } from '../../controllers/permissions/PermissionController.js';
 import { auth } from '../../middlewares/index.js';
 import { can } from '../../middlewares/auth/check-permission.js';
@@ -24,5 +25,6 @@ router.delete('/:permission_id', auth, can('permissions'), deletePermission);
 router.delete('/role/:role_id', auth, can('permissions'), deleteRole);
 router.put('/role/:role_id', auth, can('permissions'), updateRole);
 router.put('/assign', auth, can('permissions'), assignRole);
+router.get('/users', auth, can('permissions'), getAllUsers);
 
 export default router;

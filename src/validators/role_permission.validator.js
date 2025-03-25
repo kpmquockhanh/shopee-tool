@@ -33,3 +33,11 @@ export function validateAssignRole(body) {
   });
   return schema.validate(body);
 }
+
+export function validateGetListUsers(query) {
+  const schema = Joi.object({
+    page: Joi.number(),
+    limit: Joi.number(),
+  })
+  return schema.validate(query)
+}

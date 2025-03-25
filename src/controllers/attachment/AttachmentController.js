@@ -1,8 +1,11 @@
-import { Attachment, Relationship, User } from '../../models/index.js';
+import {
+  Attachment, Relationship, Role, User,
+} from '../../models/index.js';
 import {
   validateCreateAttachment,
   validateDeleteAttachment, validateDeleteUnusedAttachments,
   validateGetAttachment, validateGetUnusedAttachments,
+  validateUpdateVisibility,
 } from '../../validators/attachment.validator.js';
 import { blackblazeBucketId } from '../../config/index.js';
 import {
@@ -23,25 +26,54 @@ export const getAttachments = async (req, res) => {
     },
   };
 
-  const { user } = req;
-  const listAvailableUserIds = [user._id];
+  const sAdminRole = await Role.findOne({
+    name: 'SAdmin',
+  });
 
-  const relationships = await Relationship.find({
-    $or: [{ origin: user._id }, { target: user._id }],
-    type: 'friend',
-    status: 'accepted',
+  const adminUsers = await User.find({
+    roles: {
+      $in: [sAdminRole._id],
+    },
   });
-  relationships.forEach((r) => {
-    if (r.origin._id.toString() !== user._id.toString()) {
-      listAvailableUserIds.push(r.origin._id);
+
+  // If this is a public request, only show public attachments
+  if (req.path === '/public') {
+    const { type } = req.query;
+    cond.public = true;
+    if (type !== 'all') {
+      cond.createdBy = {
+        $nin: adminUsers.map((u) => u._id),
+      };
     }
-    if (r.target._id.toString() !== user._id.toString()) {
-      listAvailableUserIds.push(r.target._id);
-    }
-  });
-  cond.createdBy = {
-    $in: listAvailableUserIds,
-  };
+  } else if (req.path === '/admin') {
+    cond.public = true;
+    cond.createdBy = {
+      $in: adminUsers.map((u) => u._id),
+    };
+  } else {
+    const { user } = req;
+    const listAvailableUserIds = [user._id];
+
+    const relationships = await Relationship.find({
+      $or: [{ origin: user._id }, { target: user._id }],
+      type: 'friend',
+      status: 'accepted',
+    });
+    relationships.forEach((r) => {
+      if (r.origin._id.toString() !== user._id.toString()) {
+        listAvailableUserIds.push(r.origin._id);
+      }
+      if (r.target._id.toString() !== user._id.toString()) {
+        listAvailableUserIds.push(r.target._id);
+      }
+    });
+
+    cond.$or = [{
+      createdBy: {
+        $in: listAvailableUserIds,
+      },
+    }, { public: true }];
+  }
 
   const attachments = await Attachment
     .find(cond)
@@ -52,6 +84,8 @@ export const getAttachments = async (req, res) => {
       width: 1,
       height: 1,
       description: 1,
+      public: 1,
+      featured: 1,
     })
     .sort({ createdAt: -1 })
     .populate({
@@ -67,15 +101,18 @@ export const getAttachments = async (req, res) => {
   // Count total
   const total = await Attachment.count(cond);
   return res.status(200).json({
-    attachments: attachments.map((attachment) => ({
-      ...attachment.toJSON(),
-      createdBy: {
-        ...attachment.createdBy.toJSON(),
-        photoUrl: attachment.createdBy.toJSON().photo?.src ? genB2Link(attachment.createdBy.toJSON().photo.src) : '',
-      },
-      fullPath: genB2Link(attachment.src),
-    })),
-    total,
+    code: 200,
+    data: {
+      attachments: attachments.map((attachment) => ({
+        ...attachment.toJSON(),
+        createdBy: {
+          ...attachment.createdBy.toJSON(),
+          photoUrl: attachment.createdBy.toJSON().photo?.src ? genB2Link(attachment.createdBy.toJSON().photo.src) : '',
+        },
+        fullPath: genB2Link(attachment.src),
+      })),
+      total,
+    },
   });
 };
 
@@ -105,7 +142,10 @@ export const createAttachment = async (req, res) => {
     const rabbitmqConnection = await req.app.get('mqConnection');
     rabbitmqConnection.sendToQueue('new-image', { attachment_id: attachment._id }).then();
     return res.status(201).json({
-      attachment,
+      code: 200,
+      data: {
+        attachment,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -295,4 +335,40 @@ export const deleteUnusedAttachments = async (req, res) => {
     return res.status(500).json(errorHelper('00090', req, e.message));
   }
   return res.status(204).json();
+};
+
+export const updateAttachmentVisibility = async (req, res) => {
+  const rs = validateUpdateVisibility(req.body);
+  if (rs.error) {
+    return res.status(400).json(rs.error);
+  }
+
+  const { attachment_id } = req.params;
+  const { public: isPublic } = req.body;
+
+  const attachment = await Attachment.findOne({
+    _id: attachment_id,
+  });
+
+  if (!attachment) {
+    return res.status(404).json({
+      message: 'Attachment not found',
+    });
+  }
+
+  const { user } = req;
+  const userDb = await User.findById(user._id);
+  if (userDb.type !== 'admin' && user._id.toString() !== attachment.createdBy.toString()) {
+    return res.status(403).json({
+      message: 'You are not authorized to update this attachment',
+    });
+  }
+
+  attachment.public = isPublic;
+  await attachment.save();
+
+  return res.status(200).json({
+    message: 'Attachment visibility updated successfully',
+    attachment,
+  });
 };

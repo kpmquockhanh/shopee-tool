@@ -9,6 +9,7 @@ import AttachmentModel from './attachment.js';
 import RelationshipModel from './relationship.js';
 import RoleModel from './role.js';
 import PermissionModel from './permission.js';
+import CommentModel from './comment.js';
 
 export const User = userModel;
 export const Token = tokenModel;
@@ -21,3 +22,5 @@ export const Attachment = AttachmentModel;
 export const Relationship = RelationshipModel;
 export const Role = RoleModel;
 export const Permission = PermissionModel;
+
+export const Comment = CommentModel;

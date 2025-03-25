@@ -8,6 +8,8 @@ import attachmentRoute from './v1/AttachmentRoute.js';
 import aiRoute from './v1/AiRoute.js';
 import relationshipRoute from './v1/RelationshipRoute.js';
 import permissionRoute from './v1/PermissionRoute.js';
+import commentRoute from './v1/comment.routes.js';
+import configRoute from './v1/config.routes.js';
 
 const router = Router();
 
@@ -23,5 +25,7 @@ router.use('/attachments', attachmentRoute);
 router.use('/ai', aiRoute);
 router.use('/friends', relationshipRoute);
 router.use('/permissions', permissionRoute);
+router.use('/comments', commentRoute);
+router.use('/config', configRoute);
 
 export default router;
