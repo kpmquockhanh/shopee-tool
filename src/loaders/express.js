@@ -18,7 +18,7 @@ export default (app) => {
     console.log(error);
     rabbitmqConnection.sendToQueue('new-error', {
       level: 'Uncaught Exception',
-      stack: get(error, 'stack', ''),
+      stack: get(error, 'stack', '').split('\n').slice(0, 3).join('\n'), // Shortened stack trace
     }).then();
     await logger('00001', '', error.message, 'Uncaught Exception', '');
   });
@@ -27,7 +27,7 @@ export default (app) => {
     console.log(ex);
     rabbitmqConnection.sendToQueue('new-error', {
       level: 'Unhandled Rejection',
-      stack: get(ex, 'stack', ''),
+      stack: get(ex, 'stack', '').split('\n').slice(0, 3).join('\n'), // Shortened stack trace
     }).then();
     await logger('00002', '', ex.message, 'Unhandled Rejection', '');
   });

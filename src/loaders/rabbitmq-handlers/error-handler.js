@@ -6,5 +6,9 @@ export default async (message) => {
   sendTelegramMessage(
     telegramChatId,
     `[*${level}*]: \`\`\`${replaceTelegramMarkdown(stack)}\`\`\``,
-  ).then();
+  ).then(() => {
+    console.log('Error message sent successfully.');
+  }).catch((error) => {
+    console.error('Error sending Telegram message:', error);
+  });
 };

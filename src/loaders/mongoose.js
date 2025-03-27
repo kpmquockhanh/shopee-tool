@@ -4,7 +4,7 @@ import { dbUri, debug } from '../config/index.js';
 
 export default async (app) => {
   if (debug) {
-    mongoose.set('debug', true);
+    // mongoose.set('debug', true);
     console.log('⏳Connecting to MongoDB...', dbUri);
   } else {
     console.log('⏳Connecting to MongoDB...');

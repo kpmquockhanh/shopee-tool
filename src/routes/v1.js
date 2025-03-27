@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import responseHelper from '../utils/helpers/response-helper.js';
-import cartRoute from './v1/CartRoute.js';
-import productRoute from './v1/ProductRoute.js';
-import shopRoute from './v1/ShopeeRoute.js';
-import chatRoute from './v1/ChatRoute.js';
-import attachmentRoute from './v1/AttachmentRoute.js';
-import aiRoute from './v1/AiRoute.js';
-import relationshipRoute from './v1/RelationshipRoute.js';
-import permissionRoute from './v1/PermissionRoute.js';
-import commentRoute from './v1/comment.routes.js';
-import configRoute from './v1/config.routes.js';
+import cartRoute from './v1/cart.route.js';
+import productRoute from './v1/products.route.js';
+import shopRoute from './v1/shopee.route.js';
+import chatRoute from './v1/chat.route.js';
+import attachmentRoute from './v1/attachment.route.js';
+import aiRoute from './v1/ai.route.js';
+import relationshipRoute from './v1/relationships.route.js';
+import permissionRoute from './v1/permissions.route.js';
+import commentRoute from './v1/comments.route.js';
+import configRoute from './v1/config.route.js';
 
 const router = Router();
 
