@@ -32,8 +32,8 @@
     "event_announcement": "With gratitude and joy, we are pleased to announce that we will hold the event:",
     "ceremony": "Ceremony",
     "reception": "Reception",
-    "ceremony_time": "10:00 AM WIB - Finish",
-    "reception_time": "1:00 PM WIB - Finish",
+    "ceremony_time": "15:00 - Sunday - 13.4.2025",
+    "reception_time": "15:00 - Sunday - 13.4.2025",
     "view_maps": "View Google Maps",
     "address": "RT 10 RW 02, Pajerukan Village, Kalibagor District, Banyumas Regency, Central Java 53191.",
     "wishes_prayers": "Wishes",
@@ -61,7 +61,9 @@
     "upload_requirements": "Supported formats: JPG, PNG, GIF",
     "cancel": "Cancel",
     "upload_photo": "Upload photo",
-    "drag_drop": "Drag & frop your image here"
+    "drag_drop": "Drag & frop your image here",
+    "photo_description": "Add a description to your photo",
+    "description_help": "Maximum 200 characters"
   },
   "time": {
     "just_now": "just now",

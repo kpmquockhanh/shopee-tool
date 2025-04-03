@@ -32,8 +32,8 @@
     "event_announcement": "Với lòng biết ơn và niềm vui, chúng tôi xin trân trọng thông báo về sự kiện này:",
     "ceremony": "Lễ cưới",
     "reception": "Tiệc cưới",
-    "ceremony_time": "10:00 sáng WIB - Kết thúc",
-    "reception_time": "1:00 chiều WIB - Kết thúc",
+    "ceremony_time": "15:00 - Chủ nhật - 13.4.2025",
+    "reception_time": "15:00 - Chủ nhật - 13.4.2025",
     "view_maps": "Xem Google Maps",
     "address": "RT 10 RW 02, Xã Pajerukan, Huyện Kalibagor, Tỉnh Banyumas, Trung Java 53191.",
     "wishes_prayers": "Lời chúc",
@@ -61,7 +61,9 @@
     "upload_requirements": "Định dạng hỗ trợ: JPG, PNG, GIF",
     "cancel": "Hủy bỏ",
     "upload_photo": "Tải ảnh lên",
-    "drag_drop": "Kéo thả ảnh vào đây"
+    "drag_drop": "Kéo thả ảnh vào đây",
+    "photo_description": "Gửi gắm những lời nhắn của bạn",
+    "description_help": "Tối đa 200 kí tự"
   },
   "time": {
     "just_now": "vừa xong",
