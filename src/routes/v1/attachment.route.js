@@ -6,7 +6,7 @@ import {
   getAttachments,
   getUnusedAttachments,
   updateAttachmentVisibility,
-} from '../../controllers/attachment/AttachmentController.js';
+} from '../../controllers/attachment/attachment.controller.js';
 import { can } from '../../middlewares/auth/check-permission.js';
 
 const router = Router();

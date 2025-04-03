@@ -16,7 +16,7 @@
     "wedding_date": "Chủ nhật, ngày 13 tháng 4 năm 2025",
     "save_calendar": "Lưu vào Google Calendar",
     "scroll_down": "Cuộn xuống",
-    "this_is_demo": "Đây là bản demo",
+    "this_is_demo": "Hai Trái Tim, Một Hành Trình",
     "invitation_respect": "Trân trọng kính mời quý vị đến tham dự lễ cưới của chúng tôi:",
     "groom_name": "Lưu Quốc Khánh",
     "bride_name": "Nguyễn Thị Ngọc Nga",
@@ -56,7 +56,12 @@
     "no_comments": "Chưa có lời chúc nào",
     "address_bride": "Xóm Đức Phú, Xã Phúc Thuận, TP Phổ Yên, Thái Nguyên",
     "address_groom": "Xóm Hậu, Xã Cao Xá, Huyện Tân Yên, Bắc Giang",
-    "gift_desc": "Rất trân trọng với những lới chúc cũng như món quà của tất cả mọi người:"
+    "gift_desc": "Rất trân trọng với những lới chúc cũng như món quà của tất cả mọi người:",
+    "upload_instructions": "Chia sẻ những khoảnh khắc quý giá của bạn với chúng tôi bằng cách tải lên ảnh của bạn.",
+    "upload_requirements": "Định dạng hỗ trợ: JPG, PNG, GIF",
+    "cancel": "Hủy bỏ",
+    "upload_photo": "Tải ảnh lên",
+    "drag_drop": "Kéo thả ảnh vào đây"
   },
   "time": {
     "just_now": "vừa xong",

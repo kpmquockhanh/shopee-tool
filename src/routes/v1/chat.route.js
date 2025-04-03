@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { auth, imageUpload } from '../../middlewares/index.js';
 import {
   getMessages, sendMessage, createRoom, getRooms, deleteRoom, updateRoom,
-} from '../../controllers/chat/ChatController.js';
+} from '../../controllers/chat/chat.controller.js';
 
 const router = Router();
 

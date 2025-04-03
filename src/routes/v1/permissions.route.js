@@ -9,7 +9,7 @@ import {
   updatePermissions,
   updateRole,
   getAllUsers,
-} from '../../controllers/permissions/PermissionController.js';
+} from '../../controllers/permissions/permission.controller.js';
 import { auth } from '../../middlewares/index.js';
 import { can } from '../../middlewares/auth/check-permission.js';
 

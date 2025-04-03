@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   createNewCart, deleteCart,
   getCartByToken, updateCartItems, deleteCartItems, syncCartItems, deleteAllCart,
-} from '../../controllers/shopee/CartController.js';
+} from '../../controllers/shopee/cart.controller.js';
 import { cartMiddleware } from '../../middlewares/index.js';
 
 const router = Router();
