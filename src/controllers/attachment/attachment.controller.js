@@ -25,6 +25,8 @@ export const getAttachments = async (req, res) => {
       $in: ['preview'],
     },
   };
+  let isAdmin = false;
+  let hasSAdminRole = false;
 
   const sAdminRole = await Role.findOne({
     name: 'SAdmin',
@@ -53,6 +55,11 @@ export const getAttachments = async (req, res) => {
   } else {
     const { user } = req;
     const listAvailableUserIds = [user._id];
+    const userDb = await User.findById(user._id);
+    isAdmin = userDb.type === 'admin';
+
+    // Check if user has SAdmin role
+    hasSAdminRole = userDb.roles && userDb.roles.includes(sAdminRole._id);
 
     const relationships = await Relationship.find({
       $or: [{ origin: user._id }, { target: user._id }],
@@ -100,14 +107,6 @@ export const getAttachments = async (req, res) => {
     .skip((page - 1) * limit);
   // Count total
   const total = await Attachment.count(cond);
-
-  // Get current user's admin status
-  const { user } = req;
-  const userDb = await User.findById(user._id);
-  const isAdmin = userDb.type === 'admin';
-
-  // Check if user has SAdmin role
-  const hasSAdminRole = userDb.roles && userDb.roles.includes(sAdminRole._id);
 
   return res.status(200).json({
     code: 200,
