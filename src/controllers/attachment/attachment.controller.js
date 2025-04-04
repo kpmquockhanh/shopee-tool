@@ -27,6 +27,7 @@ export const getAttachments = async (req, res) => {
   };
   let isAdmin = false;
   let hasSAdminRole = false;
+  const { user } = req;
 
   const sAdminRole = await Role.findOne({
     name: 'SAdmin',
@@ -53,7 +54,6 @@ export const getAttachments = async (req, res) => {
       $in: adminUsers.map((u) => u._id),
     };
   } else {
-    const { user } = req;
     const listAvailableUserIds = [user._id];
     const userDb = await User.findById(user._id);
     isAdmin = userDb.type === 'admin';
@@ -112,7 +112,7 @@ export const getAttachments = async (req, res) => {
     code: 200,
     data: {
       attachments: attachments.map((attachment) => {
-        const isCreator = user._id.toString() === attachment.createdBy.toString();
+        const isCreator = user && user._id.toString() === attachment.createdBy.toString();
         return {
           ...attachment.toJSON(),
           createdBy: {
