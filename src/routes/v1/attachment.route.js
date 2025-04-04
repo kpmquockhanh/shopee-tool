@@ -21,6 +21,6 @@ router.get('/unused', auth, can('remove-duplicates'), getUnusedAttachments);
 router.delete('/unused', auth, can('remove-duplicates'), deleteUnusedAttachments);
 router.post('/', auth, imageUpload(10000000), createAttachment);
 router.delete('/:attachment_id', auth, deleteAttachment);
-router.patch('/:attachment_id/visibility', auth, updateAttachmentVisibility);
+router.put('/:attachment_id/visibility', auth, updateAttachmentVisibility);
 
 export default router;

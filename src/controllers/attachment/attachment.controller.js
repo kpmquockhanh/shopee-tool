@@ -100,17 +100,32 @@ export const getAttachments = async (req, res) => {
     .skip((page - 1) * limit);
   // Count total
   const total = await Attachment.count(cond);
+
+  // Get current user's admin status
+  const { user } = req;
+  const userDb = await User.findById(user._id);
+  const isAdmin = userDb.type === 'admin';
+
+  // Check if user has SAdmin role
+  const hasSAdminRole = userDb.roles && userDb.roles.includes(sAdminRole._id);
+
   return res.status(200).json({
     code: 200,
     data: {
-      attachments: attachments.map((attachment) => ({
-        ...attachment.toJSON(),
-        createdBy: {
-          ...attachment.createdBy.toJSON(),
-          photoUrl: attachment.createdBy.toJSON().photo?.src ? genB2Link(attachment.createdBy.toJSON().photo.src) : '',
-        },
-        fullPath: genB2Link(attachment.src),
-      })),
+      attachments: attachments.map((attachment) => {
+        const isCreator = user._id.toString() === attachment.createdBy.toString();
+        return {
+          ...attachment.toJSON(),
+          createdBy: {
+            ...attachment.createdBy.toJSON(),
+            photoUrl: attachment.createdBy.toJSON().photo?.src
+              ? genB2Link(attachment.createdBy.toJSON().photo.src)
+              : '',
+          },
+          fullPath: genB2Link(attachment.src),
+          can_delete: isAdmin || hasSAdminRole || isCreator,
+        };
+      }),
       total,
     },
   });
