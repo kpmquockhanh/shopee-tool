@@ -87,6 +87,12 @@ export const createComment = async (req, res) => {
 
 export const getComments = async (req, res) => {
   try {
+    const currentPage = parseInt(req.query.page, 10) || 1;
+    const pageSize = parseInt(req.query.limit, 10) || 10;
+    const skipCount = (currentPage - 1) * pageSize;
+
+    const totalComments = await Comment.countDocuments({ parent_id: null });
+
     const comments = await Comment.find({ parent_id: null })
       .populate('user', 'name email')
       .populate({
@@ -105,7 +111,9 @@ export const getComments = async (req, res) => {
           },
         ],
       })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skipCount)
+      .limit(pageSize);
 
     let processedComments = [];
     if (req.user) {
@@ -117,7 +125,16 @@ export const getComments = async (req, res) => {
 
     return res.status(200).json({
       code: 200,
-      data: processedComments,
+      data: {
+        comments: processedComments,
+        pagination: {
+          total: totalComments,
+          page: currentPage,
+          limit: pageSize,
+          totalPages: Math.ceil(totalComments / pageSize),
+        },
+      },
+
     });
   } catch (err) {
     return res.status(500).json(errorHelper('00014', req, err.message));
