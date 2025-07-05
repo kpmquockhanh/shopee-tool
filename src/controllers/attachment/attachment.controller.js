@@ -230,8 +230,8 @@ export const getUnusedAttachments = async (req, res) => {
   if (rs.error) {
     return res.status(400).json(rs.error);
   }
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
+  // const page = parseInt(req.query.page, 10) || 1;
+  // const limit = parseInt(req.query.limit, 10) || 10;
   const cond = {
     // refId: null,
   };
@@ -242,10 +242,10 @@ export const getUnusedAttachments = async (req, res) => {
       src: 1,
       refId: 1,
       type: 1,
-    })
-    .sort({ createdAt: -1 })
-    .limit(limit || 10)
-    .skip((page - 1) * limit);
+    });
+    // .sort({ createdAt: -1 })
+    // .limit(limit || 10)
+    // .skip((page - 1) * limit);
 
   const availAttachments = {};
   const filteredAttachmentIds = [];
