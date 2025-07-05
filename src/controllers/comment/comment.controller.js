@@ -1,5 +1,5 @@
 import { Comment, User } from '../../models/index.js';
-import { errorHelper } from '../../utils/index.js';
+import { errorHelper, genB2Link } from '../../utils/index.js';
 import timeDiff from '../../utils/helpers/time-helper.js';
 
 // Add can_delete field to comments
@@ -8,6 +8,7 @@ const processComments = (
   commentList,
   user,
   isChild = false,
+  isRawDate = false,
 ) => commentList.map((comment) => {
   let commentObj;
   if (!isChild) {
@@ -19,7 +20,7 @@ const processComments = (
   const userId = user?._id ?? -1;
   if (user) {
     const roles = user.roles.map((r) => r.name);
-    commentObj.can_delete = comment.user?._id.toString() === userId || roles.some((r) => r === 'SAdmin');
+    commentObj.can_delete = comment.user?._id.toString() === userId.toString() || roles.some((r) => r === 'SAdmin');
   } else {
     commentObj.can_delete = false;
   }
@@ -30,8 +31,14 @@ const processComments = (
     commentObj.comments = processComments(req, commentObj.comments, user, true);
   }
 
+  if (commentObj.user) {
+    commentObj.user.photoUrl = commentObj.user.photo?.src
+      ? genB2Link(commentObj.user.photo.src)
+      : '';
+  }
+
   commentObj.uuid = commentObj._id;
-  commentObj.created_at = timeDiff(commentObj.createdAt, req.query.lang || 'vi');
+  commentObj.created_at = isRawDate ? commentObj.createdAt : timeDiff(commentObj.createdAt, req.query.lang || 'vi');
   delete commentObj.__v;
   delete commentObj._id;
   delete commentObj.createdAt;
@@ -71,9 +78,9 @@ export const createComment = async (req, res) => {
     let processedComments = [];
     if (req.user) {
       const dbUser = await User.findById(req.user._id).populate('roles').select('roles');
-      processedComments = processComments(req, [populatedComment], dbUser);
+      processedComments = processComments(req, [populatedComment], dbUser, false, true);
     } else {
-      processedComments = processComments(req, [populatedComment], req.user);
+      processedComments = processComments(req, [populatedComment], req.user, false, true);
     }
 
     return res.status(201).json({
@@ -82,6 +89,140 @@ export const createComment = async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json(errorHelper('00013', req, err.message));
+  }
+};
+
+export const createPostComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { comment, gif_url, presence } = req.body;
+
+    const newComment = await Comment.create({
+      name: req.user?.name || 'Anonymous',
+      comment,
+      gif_url,
+      presence,
+      ref_id: id,
+      ref_type: 'post',
+      user: req.user?._id || null,
+    });
+
+    const commentObj = await Comment.findById(newComment._id)
+    .populate({
+      path: 'user',
+      select: 'name email',
+      populate: {
+        path: 'photo',
+        select: 'src',
+      },
+    })
+    .populate({
+      path: 'comments',
+      populate: [
+        {
+          path: 'user',
+          select: 'name email',
+        },
+        {
+          path: 'comments',
+          populate: {
+            path: 'user',
+            select: 'name email',
+          },
+        },
+      ],
+    })
+
+    let processedComments = [];
+    if (req.user) {
+      const dbUser = await User.findById(req.user._id).populate('roles').select('roles');
+      processedComments = processComments(req, [commentObj], dbUser, false, true);
+    } else {
+      processedComments = processComments(req, [commentObj], req.user, false, true);
+    }
+
+    return res.status(201).json({
+      code: 201,
+      data: processedComments[0],
+    });
+  } catch (err) {
+    return res.status(500).json(errorHelper('00013', req, err.message));
+  }
+};
+
+export const getPostComments = async (req, res) => {
+  try {
+    const currentPage = parseInt(req.query.page, 10) || 1;
+    const pageSize = parseInt(req.query.limit, 10) || 10;
+    const skipCount = (currentPage - 1) * pageSize;
+
+    const conditions = {
+      parent_id: null,
+      ref_type: 'post',
+    };
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json(errorHelper('00021', req, 'Ref ID is required'));
+    }
+
+    conditions.ref_id = id;
+
+    const totalComments = await Comment.countDocuments(conditions);
+
+    const comments = await Comment.find(conditions)
+      .populate({
+        path: 'user',
+        select: 'name email',
+        populate: {
+          path: 'photo',
+          select: 'src',
+        },
+      })
+      .populate({
+        path: 'comments',
+        populate: [
+          {
+            path: 'user',
+            select: 'name email',
+          },
+          {
+            path: 'comments',
+            populate: {
+              path: 'user',
+              select: 'name email',
+            },
+          },
+        ],
+      })
+      .sort({ createdAt: 1 })
+      .skip(skipCount)
+      .limit(pageSize);
+
+    let processedComments = [];
+    if (req.user) {
+      const dbUser = await User.findById(req.user._id).populate('roles').select('roles');
+      processedComments = processComments(req, comments, dbUser, false, true);
+    } else {
+      processedComments = processComments(req, comments, req.user, false, true);
+    }
+
+    return res.status(200).json({
+      code: 200,
+      data: {
+        comments: processedComments,
+        pagination: {
+          total: totalComments,
+          page: currentPage,
+          limit: pageSize,
+          totalPages: Math.ceil(totalComments / pageSize),
+        },
+      },
+
+    });
+  } catch (err) {
+    console.log('KPM err', err);
+    return res.status(500).json(errorHelper('00014', req, err.message));
   }
 };
 
@@ -118,9 +259,9 @@ export const getComments = async (req, res) => {
     let processedComments = [];
     if (req.user) {
       const dbUser = await User.findById(req.user._id).populate('roles').select('roles');
-      processedComments = processComments(req, comments, dbUser);
+      processedComments = processComments(req, comments, dbUser, false, true);
     } else {
-      processedComments = processComments(req, comments, req.user);
+      processedComments = processComments(req, comments, req.user, false, true);
     }
 
     return res.status(200).json({

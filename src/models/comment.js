@@ -27,6 +27,15 @@ const commentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Comment',
   }],
+  ref_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: null,
+  },
+  ref_type: {
+    type: String,
+    enum: ['post', 'comment'],
+    default: null,
+  },
 }, {
   timestamps: true,
   toJSON: {

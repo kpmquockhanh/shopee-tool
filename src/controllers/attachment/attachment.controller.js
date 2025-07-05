@@ -93,6 +93,7 @@ export const getAttachments = async (req, res) => {
       description: 1,
       public: 1,
       featured: 1,
+      createdAt: 1,
     })
     .sort({ createdAt: -1 })
     .populate({
