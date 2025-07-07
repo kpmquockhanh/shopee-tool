@@ -1,15 +1,27 @@
-version: '3.6'
-
 services:
-#  worker:
-#    image: node:20.11.0-alpine
-#    container_name: sp-worker
-#    volumes:
-#      - .:/app
-#    ports:
-#      - "8000:8000"
-#    networks:
-#      - sp
+  app:
+    build: .
+    container_name: sp-app
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    networks:
+      - sp
+    command: yarn dev
+    depends_on:
+      # - mongodb
+      rabbitmq:
+        condition: service_healthy
+  worker:
+   image: node:24
+   container_name: sp-worker
+   volumes:
+     - .:/app
+   ports:
+     - "8000:8000"
+   networks:
+     - sp
 
   mongodb:
     image: mongo:4.2.3-bionic
@@ -31,9 +43,15 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.8-management
+    container_name: sp-rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - rabbitmq_logs:/var/log/rabbitmq

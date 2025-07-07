@@ -1,19 +1,22 @@
-FROM node:16-alpine
+FROM node:24-bullseye
 
-# Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
-COPY . .
-RUN yarn
-# If you are building your code for production
-# RUN npm ci --only=production
+# Install system dependencies for sharp
+RUN apt-get update && apt-get install -y \
+  libvips-dev \
+  build-essential \
+  python3
 
-# Bundle app source
+# Enable Yarn (via Corepack)
+RUN corepack enable
+
+# Copy package files and install dependencies
+COPY package.json ./
+RUN yarn install
+
+# Copy the rest of the app
 COPY . .
 
 EXPOSE 3000
-CMD [ "node", "src/app.js" ]
+CMD ["yarn", "dev"] # or whatever your start command is

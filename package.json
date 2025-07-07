@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Individual project.",
   "main": "app.js",
-  "engines": {
-    "node": "20.x"
-  },
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon",
@@ -45,13 +42,13 @@
     "node-gyp": "10.0.1",
     "node-schedule": "^2.1.1",
     "nodemailer": "^6.5.0",
-    "nodemon": "^2.0.20",
+    "nodemon": "^3.1.10",
     "npm": "^7.6.0",
     "prettier": "^2.8.3",
     "query-string": "^8.1.0",
     "randomstring": "^1.1.5",
     "rate-limiter-flexible": "^2.2.1",
-    "sharp": "^0.33.4",
+    "sharp": "^0.34.2",
     "socket.io": "^4.7.2",
     "swagger-jsdoc": "^6.0.8",
     "swagger-ui-express": "^4.1.6",
