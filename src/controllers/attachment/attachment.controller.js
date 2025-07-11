@@ -7,7 +7,7 @@ import {
   validateGetAttachment, validateGetUnusedAttachments,
   validateUpdateVisibility,
 } from '../../validators/attachment.validator.js';
-import { blackblazeBucketId } from '../../config/index.js';
+import {blackblazeBucketId, subFolder} from '../../config/index.js';
 import {
   errorHelper, genB2Link,
 } from '../../utils/index.js';
@@ -21,9 +21,9 @@ export const getAttachments = async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 10;
   const cond = {
-    // type: {
-    //   $in: ['preview'],
-    // },
+    type: {
+      $in: ['image'],
+    },
   };
   let isAdmin = false;
   let hasSAdminRole = false;
@@ -231,6 +231,9 @@ export const getUnusedAttachments = async (req, res) => {
   // const limit = parseInt(req.query.limit, 10) || 10;
   const cond = {
     // refId: null,
+    src: {
+      $regex : `^${subFolder}\/`
+    }
   };
 
   const attachments = await Attachment
@@ -248,23 +251,20 @@ export const getUnusedAttachments = async (req, res) => {
   const filteredAttachmentIds = [];
   const deletedAttachmentIds = [];
   // const endOfSrcToRefId = {};
-  const refIdTofileName = {};
+  const refIdToFileName = {};
 
   attachments.forEach((attachment) => {
     const endOfSrc = attachment.src.split('/').pop();
     // endOfSrcToRefId[endOfSrc] = attachment.refId;
-    refIdTofileName[attachment.refId] = attachment.src;
+    refIdToFileName[attachment.refId] = attachment.src;
     if (availAttachments[endOfSrc] === undefined) {
       availAttachments[endOfSrc] = {
-        preview: '',
         image: '',
         profile_image: '',
       };
     }
 
-    if (attachment.type === 'preview') {
-      availAttachments[endOfSrc].preview = attachment.refId;
-    } else if (attachment.type === 'image') {
+    if (attachment.type === 'image') {
       availAttachments[endOfSrc].image = attachment.refId;
     } else if (attachment.type === 'profile_image') {
       availAttachments[endOfSrc].profile_image = attachment.refId;
@@ -275,12 +275,12 @@ export const getUnusedAttachments = async (req, res) => {
     if (availAttachments[fileName].profile_image) {
       return;
     }
-    if (!availAttachments[fileName].preview || !availAttachments[fileName].image) {
+    if (!availAttachments[fileName].image) {
       const refId = availAttachments[fileName].image || availAttachments[fileName].preview;
       filteredAttachmentIds.push({
-        fileName: refIdTofileName[refId],
+        fileName: refIdToFileName[refId],
         id: refId,
-        fullPath: genB2Link(refIdTofileName[refId]),
+        fullPath: genB2Link(refIdToFileName[refId]),
       });
     }
   });
@@ -288,6 +288,7 @@ export const getUnusedAttachments = async (req, res) => {
   const filenames = await b2.listFileNames({
     bucketId: blackblazeBucketId,
     // maxFileCount: 100,
+    prefix: subFolder
   });
 
   filenames.data.files.forEach((filename) => {
