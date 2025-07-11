@@ -21,9 +21,9 @@ export const getAttachments = async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 10;
   const cond = {
-    type: {
-      $in: ['preview'],
-    },
+    // type: {
+    //   $in: ['preview'],
+    // },
   };
   let isAdmin = false;
   let hasSAdminRole = false;
@@ -116,13 +116,6 @@ export const getAttachments = async (req, res) => {
         const isCreator = user && user._id.toString() === attachment.createdBy.toString();
         return {
           ...attachment.toJSON(),
-          createdBy: {
-            ...attachment.createdBy.toJSON(),
-            photoUrl: attachment.createdBy.toJSON().photo?.src
-              ? genB2Link(attachment.createdBy.toJSON().photo.src)
-              : '',
-          },
-          fullPath: genB2Link(attachment.src),
           can_delete: isAdmin || hasSAdminRole || isCreator,
         };
       }),
@@ -150,16 +143,20 @@ export const createAttachment = async (req, res) => {
 
     const ts = Date.now();
     // Upload original file
-    const origin = await uploadFile(b2, uploadUrl, uploadAuthToken, 'image', req, ts);
+    const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, 'image', req, ts);
     // Update preview file
-    const attachment = await uploadFile(b2, uploadUrl, uploadAuthToken, 'image', req, ts, origin);
+    // const attachment = await uploadFile(
+    // b2, uploadUrl, uploadAuthToken, 'image', req, ts, origin);
 
     const rabbitmqConnection = await req.app.get('mqConnection');
     rabbitmqConnection.sendToQueue('new-image', { attachment_id: attachment._id }).then();
     return res.status(201).json({
       code: 200,
       data: {
-        attachment,
+        attachment: {
+          ...attachment.toJSON(),
+          can_delete: true,
+        },
       },
     });
   } catch (error) {

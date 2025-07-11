@@ -1,12 +1,13 @@
 import sharp from 'sharp';
-import sizeOf from 'buffer-image-size';
-import { blackblazeBucketUrl, subFolder } from '../../config/index.js';
+import { subFolder } from '../../config/index.js';
 import { Attachment } from '../../models/index.js';
 
-// eslint-disable-next-line import/prefer-default-export
 export const genB2Link = (url) => {
   if (!url) return null;
-  return `${blackblazeBucketUrl}${url}`;
+
+  // optimize image now moved to cloudflare images
+  // return `${blackblazeBucketUrl}${url}`;
+  return url;
 };
 
 export const uploadFile = async (
@@ -16,28 +17,35 @@ export const uploadFile = async (
   type,
   req,
   ts,
-  origin = null,
+  // origin = null,
 ) => {
   let path = `${ts}_${req.file.originalname}`;
 
   if (subFolder) {
     path = `${subFolder}/${path}`;
   }
-  let data = req.file.buffer;
-  const contentLength = req.file.size;
-  let originId = null;
-  if (origin) {
-    path = `preview/${path}`;
-    type = 'preview';
-    originId = origin._id;
+  const { data, info } = await sharp(
+    req.file.buffer,
+    { pages: -1 },
+  )
+    .toBuffer({ resolveWithObject: true });
+  // let originId = null;
+  // if (origin) {
+  //   path = `preview/${path}`;
+  //   type = 'preview';
+  //   originId = origin._id;
+  //
+  //   const obj = await sharp(req.file.buffer, { pages: -1 })
+  //     .jpeg({ quality: 45 })
+  //     .rotate()
+  //     .resize(info.width > 300 ? 300 : parseInt(info.width * 0.8, 10))
+  //     .toFormat(info.format)
+  //     .toBuffer({ resolveWithObject: true });
+  //   data = obj.data;
+  //   info = obj.info;
+  // }
 
-    data = await sharp(req.file.buffer, { pages: -1 })
-      .jpeg({ quality: 60 })
-      .rotate()
-      .resize(300)
-      .gif()
-      .toBuffer();
-  }
+  const contentLength = data.size;
 
   const resp = await b2.uploadFile({
     uploadUrl,
@@ -47,17 +55,24 @@ export const uploadFile = async (
     contentLength,
   });
 
-  const dimensions = sizeOf(data);
   const attachment = new Attachment({
     ...req.body,
     src: resp.data.fileName,
     createdBy: req.user._id,
     refId: resp.data.fileId,
-    width: dimensions.width || 0,
-    height: dimensions.height || 0,
+    width: info.width || 0,
+    height: (info.height || 0) / (info.pages || 1),
     type,
-    origin: originId,
+    // origin: originId,
   });
   await attachment.save();
-  return { ...(attachment.toJSON()), fullPath: genB2Link(attachment.src) };
+
+  return Attachment.findById(attachment._id).populate({
+    path: 'createdBy',
+    select: 'name photo',
+    populate: {
+      path: 'photo',
+      select: 'src',
+    },
+  });
 };
